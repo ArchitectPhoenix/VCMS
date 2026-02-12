@@ -21,12 +21,19 @@ from collections import Counter, defaultdict
 
 from pgg_p_loader import load_p_experiment
 from pgg_vcms_agent_v3 import (
-    VCMSParams, run_vcms_agent, MAX_CONTRIB, MAX_PUNISH,
+    VCMSParams, PARAM_NAMES, PARAM_BOUNDS,
+    run_vcms_agent, make_vcms_params, vcms_objective,
+    MAX_CONTRIB, MAX_PUNISH,
 )
+from scipy.optimize import minimize as scipy_minimize
 
 K_VALUES = [1, 2, 3, 5]
 N_ROUNDS = 10
-METHODS = ['vcms', 'profile_mean', 'carry_forward', 'group_mean', 'ewa']
+METHODS = ['vcms', 'vcms_online', 'profile_mean', 'carry_forward', 'group_mean', 'ewa']
+# vcms_online is included for comparison but underperforms the ensemble (vcms).
+# Online parameter estimation loses the diversity of the ensemble — collapsing
+# to a single parameterization is less robust than weighted averaging across
+# multiple plausible candidate dynamics.
 
 # PGG parameters (Herrmann et al. design)
 ENDOWMENT = 20
@@ -265,6 +272,154 @@ def vcms_predict(target_rounds, library, exclude_sids):
 
 
 # ================================================================
+# ONLINE PARAMETER ESTIMATION
+# ================================================================
+
+# Pre-compute bounds and ranges for regularization
+_BOUNDS = [PARAM_BOUNDS[n] for n in PARAM_NAMES]
+_RANGES = np.array([b[1] - b[0] for b in _BOUNDS])
+_LO = np.array([b[0] for b in _BOUNDS])
+_HI = np.array([b[1] for b in _BOUNDS])
+
+
+def _online_objective(x, rounds, prior_vec, reg_lambda):
+    """v3 RMSE + L2 regularization toward library prior."""
+    rmse = vcms_objective(x, rounds, PARAM_NAMES, None)
+    reg = np.sum(((x - prior_vec) / _RANGES) ** 2)
+    return rmse + reg_lambda * reg
+
+
+def quick_online_fit(observed_rounds, prior_params_dict):
+    """
+    Quick parameter fit on observed rounds, regularized toward library prior.
+
+    Uses L-BFGS-B starting from the prior. Regularization strength scales
+    inversely with observation count: strong prior when few rounds, weaker
+    as data accumulates.
+    """
+    prior_vec = np.array([prior_params_dict[n] for n in PARAM_NAMES])
+    n_obs = len(observed_rounds)
+    reg_lambda = 1.0 / max(1, n_obs)
+
+    result = scipy_minimize(
+        _online_objective,
+        x0=prior_vec,
+        args=(observed_rounds, prior_vec, reg_lambda),
+        method='L-BFGS-B',
+        bounds=_BOUNDS,
+        options={'maxiter': 30, 'ftol': 1e-5},
+    )
+
+    fitted_vec = np.clip(result.x, _LO, _HI)
+    return {n: float(fitted_vec[i]) for i, n in enumerate(PARAM_NAMES)}
+
+
+def vcms_predict_online(target_rounds, library, exclude_sids):
+    """
+    Hybrid VCMS predictor: ensemble for rounds 1-2, online fitting from round 3+.
+
+    Rounds 1-2: Use ensemble predictor (Fix 1) — not enough data to fit.
+    Rounds 3+:  Find best library match so far, use as prior for quick online
+                parameter estimation on observed rounds, predict from fitted params.
+    """
+    # Build candidate pool
+    candidates = {}
+    for sid, rec in library.items():
+        if sid in exclude_sids:
+            continue
+        candidates[sid] = {
+            'params': VCMSParams(**rec['v3_params']),
+            'params_dict': rec['v3_params'],
+        }
+
+    survivors = list(candidates.keys())
+    pred_c_list = []
+    obs_c_list = []
+    cand_pred_history = {sid: [] for sid in candidates}
+    distances = {}
+    online_params = None  # current online-fitted params
+
+    n = min(N_ROUNDS, len(target_rounds))
+    ONLINE_START = 3  # start online fitting at round 3 (need 2 observations)
+
+    for t in range(n):
+        # === PREDICTION ===
+        if t < ONLINE_START:
+            # Ensemble prediction (same as Fix 1)
+            cand_preds_c = {}
+            if t == 0:
+                for sid in survivors:
+                    result = run_vcms_agent(
+                        candidates[sid]['params'], target_rounds[:1])
+                    cand_preds_c[sid] = result['pred_contrib'][0]
+                    cand_pred_history[sid].append(result['pred_contrib'][0])
+            else:
+                for sid in survivors:
+                    result = run_vcms_agent(
+                        candidates[sid]['params'], target_rounds[:t + 1])
+                    cand_preds_c[sid] = result['pred_contrib'][t]
+                    cand_pred_history[sid] = list(result['pred_contrib'][:t + 1])
+
+            if not distances:
+                weights = {sid: 1.0 for sid in survivors}
+            else:
+                weights = {sid: 1.0 / (distances.get(sid, 0.0) + 0.001)
+                           for sid in survivors}
+            total_w = sum(weights.values())
+            pc = sum((weights[sid] / total_w) * cand_preds_c[sid]
+                     for sid in survivors)
+            pred_c_list.append(int(round(pc)))
+
+        else:
+            # Online fitting: use best match as prior, fit on observed data
+            if distances:
+                best_sid = min(distances, key=distances.get)
+            else:
+                best_sid = survivors[0] if survivors else list(candidates.keys())[0]
+
+            prior = candidates[best_sid]['params_dict']
+            online_params = quick_online_fit(target_rounds[:t], prior)
+
+            # Predict round t from online-fitted params
+            fitted = VCMSParams(**online_params)
+            result = run_vcms_agent(fitted, target_rounds[:t + 1])
+            pc = result['pred_contrib'][t]
+            pred_c_list.append(pc)
+
+        # === OBSERVE ===
+        obs_c_list.append(target_rounds[t].contribution)
+
+        # === ELIMINATE (keep running for prior selection) ===
+        if t < ONLINE_START:
+            new_distances = {}
+            for sid in survivors:
+                hist = cand_pred_history[sid]
+                nc = min(t + 1, len(hist))
+                if nc == 0:
+                    new_distances[sid] = 0.0
+                    continue
+                c_d = sum((obs_c_list[i] - hist[i]) ** 2
+                          for i in range(nc)) / (MAX_CONTRIB ** 2 * nc)
+                new_distances[sid] = math.sqrt(c_d)
+
+            if new_distances:
+                best = min(new_distances.values())
+                thresh = max(best * 3.0, 0.5)
+            else:
+                thresh = 0.5
+
+            new_surv = [s for s in survivors
+                        if new_distances.get(s, 999) <= thresh]
+            if not new_surv and new_distances:
+                new_surv = [min(new_distances, key=new_distances.get)]
+
+            survivors = new_surv
+            distances = {s: new_distances[s] for s in survivors}
+
+    return pred_c_list
+
+
+# ================================================================
 # SCORING
 # ================================================================
 
@@ -323,8 +478,11 @@ def run_cv(library, all_rounds, city_map, mode='loo', verbose=True):
         # --- Run all methods ---
         preds = {}
 
-        # 1. VCMS
+        # 1. VCMS (ensemble with Fix 1)
         preds['vcms'] = vcms_predict(rounds, library, exclude)
+
+        # 1b. VCMS with online parameter estimation
+        preds['vcms_online'] = vcms_predict_online(rounds, library, exclude)
 
         # 2. Profile-mean
         preds['profile_mean'] = profile_mean_predict(profile, train_lib)
