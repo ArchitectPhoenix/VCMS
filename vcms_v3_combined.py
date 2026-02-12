@@ -245,9 +245,12 @@ class CombinedPredictor:
 # Evaluation
 # =============================================================================
 
-def evaluate_city(library_path, city_csv, threshold=0.5, verbose=True):
+def evaluate_city(library_path, city_csv, threshold=0.5, verbose=True, sid_filter=None):
     library = FittedLibrary(library_path)
     data = load_p_experiment(city_csv)
+    if sid_filter:
+        sid_filter = set(str(s) for s in sid_filter)
+        data = {k: v for k, v in data.items() if k in sid_filter}
     predictor = CombinedPredictor(library, threshold=threshold)
 
     all_results = {}
@@ -299,6 +302,7 @@ if __name__ == '__main__':
 
     city_csv = None
     threshold = 0.5
+    sid_filter = None
     args = sys.argv[1:]
     i = 0
     while i < len(args):
@@ -306,6 +310,8 @@ if __name__ == '__main__':
             city_csv = args[i + 1]; i += 2
         elif args[i] == '--threshold' and i + 1 < len(args):
             threshold = float(args[i + 1]); i += 2
+        elif args[i] == '--sids' and i + 1 < len(args):
+            sid_filter = args[i + 1].split(','); i += 2
         else:
             i += 1
 
@@ -317,4 +323,4 @@ if __name__ == '__main__':
     if not city_csv:
         print("ERROR: No CSV found"); sys.exit(1)
 
-    evaluate_city(library_path, city_csv, threshold=threshold)
+    evaluate_city(library_path, city_csv, threshold=threshold, sid_filter=sid_filter)
