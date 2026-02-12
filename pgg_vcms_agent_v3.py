@@ -281,24 +281,30 @@ def run_vcms_agent(params: VCMSParams, rounds: List[PRoundData],
         # STEP 3: B — BUDGET UPDATE
         # Canon: D16 (B ∈ ℝ⁺), Theorem M8 (gradient), M5A/B (pathways)
         #
-        # Experience signal: how well did the group treat me?
-        #   experience > 0 → others cooperated more than me (positive)
-        #   experience < 0 → I cooperated more (exploitation)
+        # Unified experience signal: cooperation context + punishment
+        #   experience = (group cooperation - own contribution - punishment received)
+        #   experience > 0 → net positive (unpunished free-riding or cooperative match)
+        #   experience < 0 → net negative (exploitation, or punishment makes defection costly)
         #
-        # Depletion: cumulative from exploitation (M5B), acute from shocks (M5A)
+        # Semantics for all cases:
+        #   Cooperator in cooperative group, no pun: experience ≈ 0 (stable)
+        #   Cooperator in defecting group:           experience < 0 (exploitation → deplete)
+        #   Defector punished:                       experience < 0 (punishment costs → deplete)
+        #   Defector unpunished:                     experience > 0 (free-riding works → replenish)
+        #
+        # Depletion: cumulative from negative experience (M5B), acute from shocks (M5A)
         # Replenishment: facilitation from positive experience (Def M1a)
-        # Punishment received: always depletes B (strain event)
         # =================================================================
 
         if i > 0:
-            experience = v_group_raw - c_prev_norm
+            experience = v_group_raw - c_prev_norm - (pun_recv_prev / 15.0)
         else:
             experience = 0.0
 
         b_pre = B
 
         if experience < 0:
-            # Exploitation → B depletes
+            # Negative experience → B depletes
             magnitude = abs(experience)
             depletion = p.b_depletion_rate * magnitude
             # Acute pathway: step-function amplification (Theorem M5A)
@@ -308,10 +314,6 @@ def run_vcms_agent(params: VCMSParams, rounds: List[PRoundData],
         else:
             # Positive experience → B replenishes (Def M1a: facilitation)
             B += p.b_replenish_rate * experience
-
-        # Punishment received → B depletes (always a strain event)
-        if i > 0:
-            B -= p.b_depletion_rate * (pun_recv_prev / 15.0)
 
         B = max(0.0, B)
 
