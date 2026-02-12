@@ -29,7 +29,9 @@ from scipy.optimize import minimize as scipy_minimize
 
 K_VALUES = [1, 2, 3, 5]
 N_ROUNDS = 10
-METHODS = ['vcms', 'vcms_online', 'profile_mean', 'carry_forward', 'group_mean', 'ewa']
+METHODS = ['vcms_drift', 'vcms', 'vcms_online', 'profile_mean', 'carry_forward', 'group_mean', 'ewa']
+# vcms_drift: hybrid CF + VCMS — carry-forward baseline plus v3 predicted drift.
+#   Guaranteed >= carry-forward when drift is zero; better when v3 anticipates transitions.
 # vcms_online is included for comparison but underperforms the ensemble (vcms).
 # Online parameter estimation loses the diversity of the ensemble — collapsing
 # to a single parameterization is less robust than weighted averaging across
@@ -419,6 +421,43 @@ def vcms_predict_online(target_rounds, library, exclude_sids):
     return pred_c_list
 
 
+def vcms_predict_drift(target_rounds, library, exclude_sids):
+    """
+    Hybrid CF + VCMS drift predictor.
+
+    pred_t = C_{t-1} + drift_t
+
+    where drift_t is the VCMS ensemble's predicted change from round t-1 to t.
+    Carry-forward is the implicit baseline (drift_t = 0 recovers CF exactly).
+
+    This focuses VCMS modeling power on predicting *transitions* — when and how
+    behavior changes — rather than predicting levels that CF handles for free.
+
+    For R1 (no prior observation): uses the ensemble prediction directly.
+    """
+    # Get the full ensemble predictions
+    ensemble_preds = vcms_predict(target_rounds, library, exclude_sids)
+
+    n = min(N_ROUNDS, len(target_rounds))
+    drift_preds = []
+
+    for t in range(n):
+        if t == 0:
+            # No prior observation — use ensemble directly
+            drift_preds.append(ensemble_preds[t])
+        else:
+            # CF baseline: last actual observation
+            cf_baseline = target_rounds[t - 1].contribution
+            # VCMS drift: what does the ensemble predict will change?
+            vcms_drift = ensemble_preds[t] - ensemble_preds[t - 1]
+            # Apply drift to CF baseline
+            pred = cf_baseline + vcms_drift
+            pred = max(0, min(MAX_CONTRIB, round(pred)))
+            drift_preds.append(pred)
+
+    return drift_preds
+
+
 # ================================================================
 # SCORING
 # ================================================================
@@ -481,7 +520,10 @@ def run_cv(library, all_rounds, city_map, mode='loo', verbose=True):
         # 1. VCMS (ensemble with Fix 1)
         preds['vcms'] = vcms_predict(rounds, library, exclude)
 
-        # 1b. VCMS with online parameter estimation
+        # 1b. VCMS drift (hybrid CF + ensemble drift)
+        preds['vcms_drift'] = vcms_predict_drift(rounds, library, exclude)
+
+        # 1c. VCMS with online parameter estimation
         preds['vcms_online'] = vcms_predict_online(rounds, library, exclude)
 
         # 2. Profile-mean
@@ -577,15 +619,16 @@ def print_matrix(title, agg):
             row += f"  {agg[k][m]['mean']:.4f}  "
         print(row)
 
-    # Delta vs VCMS
+    # Delta vs vcms_drift (primary method)
+    ref = 'vcms_drift' if 'vcms_drift' in METHODS else 'vcms'
     print()
-    print(f"  {'Δ vs VCMS':<20s}")
+    print(f"  {'Δ vs ' + ref:<20s}")
     for m in METHODS:
-        if m == 'vcms':
+        if m == ref:
             continue
         row = f"  {m:<20s}"
         for k in K_VALUES:
-            delta = agg[k][m]['mean'] - agg[k]['vcms']['mean']
+            delta = agg[k][m]['mean'] - agg[k][ref]['mean']
             sign = '+' if delta >= 0 else ''
             row += f"  {sign}{delta:.4f}"
         print(row)
@@ -593,23 +636,25 @@ def print_matrix(title, agg):
 
 def print_city_breakdown(city_agg):
     """Print per-city LOCO results."""
+    ref = 'vcms_drift' if 'vcms_drift' in METHODS else 'vcms'
     print(f"\n{'=' * 70}")
-    print(f"  LOCO BY CITY (VCMS vs Profile-mean)")
+    print(f"  LOCO BY CITY ({ref} vs carry_forward vs profile_mean)")
     print(f"{'=' * 70}")
 
     cities = sorted(city_agg.keys())
-    header = f"  {'City':<12s} {'n':>3s}"
-    for k in K_VALUES:
-        header += f"  VCMS k={k}  PM k={k}"
+    header = f"  {'City':<10s} {'n':>3s}"
+    for k in [1, 3, 5]:
+        header += f"  {ref[:5]} k={k}  CF k={k}  PM k={k}"
     print(header)
 
     for city in cities:
-        n = city_agg[city][K_VALUES[0]]['vcms']['n']
-        row = f"  {city:<12s} {n:>3d}"
-        for k in K_VALUES:
-            v = city_agg[city][k]['vcms']['mean']
+        n = city_agg[city][K_VALUES[0]][ref]['n']
+        row = f"  {city:<10s} {n:>3d}"
+        for k in [1, 3, 5]:
+            v = city_agg[city][k][ref]['mean']
+            cf = city_agg[city][k]['carry_forward']['mean']
             pm = city_agg[city][k]['profile_mean']['mean']
-            row += f"  {v:.4f}    {pm:.4f}"
+            row += f"  {v:.4f} {cf:.4f} {pm:.4f}"
         print(row)
 
 

@@ -1,7 +1,7 @@
 """
 PGG VCMS Dual-Output Agent v3
 ==============================
-16-parameter agent producing BOTH contribution AND punishment predictions.
+18-parameter agent producing BOTH contribution AND punishment predictions.
 Flat optimization (no staging — v2 showed staging hurts joint optima).
 
 Architecture change from v1/v2:
@@ -50,6 +50,10 @@ Canon grounding for each parameter:
   M_eval (Ch5 Theorem M1, bidirectional)
     facilitation_rate : C_eff modification from experience — positive lowers C, negative raises C
 
+  H (Horizon awareness — strategic response to game structure visibility)
+    h_strength  : Maximum fractional contribution discount at final round
+    h_start     : Round index (0-based) where horizon discounting begins
+
 Fixed architectural constants:
   B_NOISE = 0.1     : Sigmoid softness for discharge gate (Corollary 3c — imperfect self-V)
   ACUTE_MULT = 5.0  : Acute event amplification (Theorem M5A — step function, not gradual)
@@ -64,6 +68,7 @@ Knockout channels (7):
   no_discharge    : Discharge gate always closed (strain never exits through P)
   no_facilitation : M_eval accumulator frozen at 0
   no_routing      : Affordability ratio forced to 1 (S/B never affects C output)
+  no_horizon      : Horizon awareness disabled (no endgame discounting)
 """
 
 import math
@@ -92,7 +97,7 @@ EPS = 0.01             # Numerical stability floor
 
 @dataclass
 class VCMSParams:
-    """16 parameters. All canon-grounded. Rupture emergent."""
+    """18 parameters. All canon-grounded. Rupture emergent."""
 
     # V: Visibility — what δ conditions on
     alpha: float        # V_rep update rate ∈ (0.01, 0.99)
@@ -124,6 +129,10 @@ class VCMSParams:
     # M_eval: Bidirectional cost modification
     facilitation_rate: float  # Experience → C_eff change rate ∈ [0, 1]
 
+    # H: Horizon awareness — strategic response to game structure visibility
+    h_strength: float = 0.0    # Max contribution discount at final round ∈ [0, 1]
+    h_start: float = 7.0       # Round index (0-based) where discounting begins ∈ [0, 9]
+
 
 PARAM_NAMES = [
     'c_base', 'alpha', 'v_rep', 'v_ref',
@@ -132,6 +141,7 @@ PARAM_NAMES = [
     's_frac', 'p_scale', 's_thresh',
     'b_initial', 'b_depletion_rate', 'b_replenish_rate', 'acute_threshold',
     'facilitation_rate',
+    'h_strength', 'h_start',
 ]
 
 PARAM_BOUNDS = {
@@ -151,6 +161,8 @@ PARAM_BOUNDS = {
     'b_replenish_rate': (0.0, 2.0),
     'acute_threshold':  (0.01, 1.0),
     'facilitation_rate':(0.0, 1.0),
+    'h_strength':       (0.0, 1.0),
+    'h_start':          (0.0, 9.0),
 }
 
 DEFAULTS = {
@@ -160,6 +172,7 @@ DEFAULTS = {
     's_frac': 0.3, 'p_scale': 10.0, 's_thresh': 1.0,
     'b_initial': 2.0, 'b_depletion_rate': 0.3, 'b_replenish_rate': 0.2,
     'acute_threshold': 0.3, 'facilitation_rate': 0.1,
+    'h_strength': 0.0, 'h_start': 7.0,
 }
 
 # Knockout configurations
@@ -171,6 +184,7 @@ KNOCKOUTS = {
     'no_discharge':    {'s_thresh': 100.0},
     'no_facilitation': {'facilitation_rate': 0.0},
     'no_routing':      {},  # handled by flag in run_vcms_agent
+    'no_horizon':      {'h_strength': 0.0},
 }
 
 
@@ -185,6 +199,26 @@ def _sigmoid(x):
     else:
         ez = math.exp(x)
         return ez / (1.0 + ez)
+
+
+def _horizon_factor(t, T, h_strength, h_start):
+    """
+    Horizon discount: ramps linearly from 1.0 at h_start to (1-h_strength) at T-1.
+
+    Subjects who are aware the game is ending discount their cooperation
+    strategically — no future rounds to benefit from current cooperation,
+    no future retaliation for current defection.
+
+    Returns 1.0 (no discount) for t < h_start or h_strength == 0.
+    """
+    if T <= 1 or h_strength <= 0.0 or t < h_start:
+        return 1.0
+    denom = T - 1 - h_start
+    if denom <= 0:
+        # h_start >= T-1: only the last round is affected
+        return 1.0 - h_strength if t >= T - 1 else 1.0
+    progress = min(1.0, (t - h_start) / denom)
+    return 1.0 - h_strength * progress
 
 
 def run_vcms_agent(params: VCMSParams, rounds: List[PRoundData],
@@ -415,12 +449,14 @@ def run_vcms_agent(params: VCMSParams, rounds: List[PRoundData],
         # =================================================================
         # STEP 7: OUTPUT C — CONTRIBUTION
         # Canon: Affordability gates cooperation output
-        # c_out = c_norm × affordability
+        # c_out = c_norm × affordability × horizon_factor
         # When B → 0: affordability → 0, c_out → 0 (rupture emerges)
         # When B high, S low: affordability ≈ 1, c_out ≈ c_norm (normal)
+        # Near game end: horizon_factor < 1 discounts cooperation
         # =================================================================
 
-        c_out_norm = max(0.0, min(1.0, c_norm)) * affordability
+        h_factor = _horizon_factor(i, len(rounds), p.h_strength, p.h_start)
+        c_out_norm = max(0.0, min(1.0, c_norm)) * affordability * h_factor
         c_out = round(c_out_norm * MAX_CONTRIB)
         c_out = max(0, min(MAX_CONTRIB, c_out))
 
@@ -429,6 +465,7 @@ def run_vcms_agent(params: VCMSParams, rounds: List[PRoundData],
 
         rt['c_output'] = {
             'c_norm': c_norm, 'c_out_norm': c_out_norm,
+            'h_factor': h_factor,
             'c_out': c_out, 'actual_c': rd.contribution,
         }
 
