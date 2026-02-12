@@ -423,34 +423,134 @@ def vcms_predict_online(target_rounds, library, exclude_sids):
 
 def vcms_predict_drift(target_rounds, library, exclude_sids):
     """
-    Hybrid CF + VCMS drift predictor.
+    Hybrid CF + VCMS drift predictor with enhanced ensemble.
 
     pred_t = C_{t-1} + drift_t
 
-    where drift_t is the VCMS ensemble's predicted change from round t-1 to t.
-    Carry-forward is the implicit baseline (drift_t = 0 recovers CF exactly).
+    where drift_t is the ensemble's predicted change from round t-1 to t.
 
-    This focuses VCMS modeling power on predicting *transitions* — when and how
-    behavior changes — rather than predicting levels that CF handles for free.
-
-    For R1 (no prior observation): uses the ensemble prediction directly.
+    Two improvements over the base ensemble:
+      1. Recency-weighted elimination — exponential decay so recent prediction
+         accuracy matters more than early accuracy. Lets ensemble adapt faster
+         to mid-game behavioral transitions.
+      2. Delta-aware scoring — candidates scored on trajectory shape (successive
+         differences), not just levels. A candidate with constant bias but
+         correct *changes* scores well — exactly what drift prediction needs.
+         Under teacher forcing, level error = delta error per-round. But
+         trajectory-shape scoring uses hist[i]-hist[i-1] vs actual[i]-actual[i-1],
+         which rewards candidates whose *error is stable* — they predict the
+         right transitions even if shifted in level.
     """
-    # Get the full ensemble predictions
-    ensemble_preds = vcms_predict(target_rounds, library, exclude_sids)
+    RECENCY_DECAY = 0.7    # weight of round t-1 relative to t (0.7^5 ≈ 0.17)
+    DELTA_BLEND = 0.5      # weight of delta score vs level score in elimination
+
+    # Build candidate pool
+    candidates = {}
+    for sid, rec in library.items():
+        if sid in exclude_sids:
+            continue
+        candidates[sid] = {
+            'params': VCMSParams(**rec['v3_params']),
+        }
+
+    if not candidates:
+        return [10] * min(N_ROUNDS, len(target_rounds))
+
+    survivors = list(candidates.keys())
+    ensemble_preds = []
+    obs_c_list = []
+    cand_pred_history = {sid: [] for sid in candidates}
+    distances = {}
 
     n = min(N_ROUNDS, len(target_rounds))
-    drift_preds = []
 
     for t in range(n):
+        # Run v3 for all survivors on target's environment
+        cand_preds_c = {}
         if t == 0:
-            # No prior observation — use ensemble directly
+            for sid in survivors:
+                result = run_vcms_agent(
+                    candidates[sid]['params'], target_rounds[:1])
+                cand_preds_c[sid] = result['pred_contrib'][0]
+                cand_pred_history[sid].append(result['pred_contrib'][0])
+        else:
+            for sid in survivors:
+                result = run_vcms_agent(
+                    candidates[sid]['params'], target_rounds[:t + 1])
+                cand_preds_c[sid] = result['pred_contrib'][t]
+                cand_pred_history[sid] = list(result['pred_contrib'][:t + 1])
+
+        # Weighted prediction
+        if distances:
+            weights = {sid: 1.0 / (distances.get(sid, 0.0) + 0.001)
+                       for sid in survivors}
+        else:
+            weights = {sid: 1.0 for sid in survivors}
+        total_w = sum(weights.values())
+
+        pc = sum((weights[sid] / total_w) * cand_preds_c[sid]
+                 for sid in survivors)
+        ensemble_preds.append(int(round(pc)))
+
+        # Observe actual
+        obs_c_list.append(target_rounds[t].contribution)
+
+        # Enhanced elimination: recency-weighted + delta-aware
+        new_distances = {}
+        for sid in survivors:
+            hist = cand_pred_history[sid]
+            nc = min(t + 1, len(hist))
+            if nc == 0:
+                new_distances[sid] = 0.0
+                continue
+
+            # Level component: recency-weighted MSE
+            total_w_level = 0.0
+            weighted_sse_level = 0.0
+            for i in range(nc):
+                w = RECENCY_DECAY ** (nc - 1 - i)
+                err = (obs_c_list[i] - hist[i]) / MAX_CONTRIB
+                weighted_sse_level += w * err ** 2
+                total_w_level += w
+            level_dist = math.sqrt(weighted_sse_level / total_w_level)
+
+            # Delta component: recency-weighted MSE on trajectory shape
+            if nc >= 2:
+                total_w_delta = 0.0
+                weighted_sse_delta = 0.0
+                for i in range(1, nc):
+                    w = RECENCY_DECAY ** (nc - 1 - i)
+                    actual_delta = (obs_c_list[i] - obs_c_list[i - 1]) / MAX_CONTRIB
+                    pred_delta = (hist[i] - hist[i - 1]) / MAX_CONTRIB
+                    weighted_sse_delta += w * (actual_delta - pred_delta) ** 2
+                    total_w_delta += w
+                delta_dist = math.sqrt(weighted_sse_delta / total_w_delta)
+            else:
+                delta_dist = level_dist
+
+            new_distances[sid] = (1 - DELTA_BLEND) * level_dist + DELTA_BLEND * delta_dist
+
+        if new_distances:
+            best = min(new_distances.values())
+            thresh = max(best * 3.0, 0.5)
+        else:
+            thresh = 0.5
+
+        new_surv = [s for s in survivors if new_distances.get(s, 999) <= thresh]
+        if not new_surv and new_distances:
+            new_surv = [min(new_distances, key=new_distances.get)]
+
+        survivors = new_surv
+        distances = {s: new_distances[s] for s in survivors}
+
+    # Convert ensemble level predictions to CF + drift
+    drift_preds = []
+    for t in range(n):
+        if t == 0:
             drift_preds.append(ensemble_preds[t])
         else:
-            # CF baseline: last actual observation
             cf_baseline = target_rounds[t - 1].contribution
-            # VCMS drift: what does the ensemble predict will change?
             vcms_drift = ensemble_preds[t] - ensemble_preds[t - 1]
-            # Apply drift to CF baseline
             pred = cf_baseline + vcms_drift
             pred = max(0, min(MAX_CONTRIB, round(pred)))
             drift_preds.append(pred)
