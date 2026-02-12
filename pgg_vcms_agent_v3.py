@@ -286,16 +286,19 @@ def run_vcms_agent(params: VCMSParams, rounds: List[PRoundData],
         #   experience > 0 → others cooperated more than me (positive)
         #   experience < 0 → I cooperated more than them (exploitation)
         #
-        # Gated replenishment: punishment blocks facilitation.
-        #   Replenishment requires BOTH positive experience AND no punishment.
-        #   Any punishment drowns out the positive environmental signal.
+        # Graduated punishment gate on replenishment:
+        #   pun_gate = max(0, 1 - pun_recv / MAX_PUNISH)
+        #   Heavy punishment (16+ tokens) nearly shuts facilitation.
+        #   Mild punishment (2-3 tokens) allows most facilitation through.
+        #   No punishment → full facilitation. No new parameters.
         #
         # Semantics for all cases:
-        #   Cooperator, cooperative group, no pun:  exp > 0, no pun → replenish  ✓
-        #   Cooperator, defecting group:            exp < 0 → deplete (acute)    ✓
-        #   Defector, punished:                     exp > 0, but pun gate → drain ✓
-        #   Defector, NOT punished:                 exp > 0, no pun → replenish  ✓
-        #   Cooperator, antisocially punished:      exp ≈ 0, pun gate → drain    ✓
+        #   Cooperator, coop group, no pun:  exp > 0, gate=1 → full replenish
+        #   Cooperator, defecting group:     exp < 0 → deplete (acute)
+        #   Defector, heavily punished:      exp > 0, gate≈0 → drain dominates
+        #   Defector, NOT punished:          exp > 0, gate=1 → full replenish
+        #   Defector, mildly punished:       exp > 0, gate≈0.9 → partial replenish
+        #   Cooperator, antisocially pun:    exp ≈ 0, drain fires → B drops
         #
         # Depletion: cumulative from exploitation (M5B), acute from shocks (M5A)
         # Replenishment: facilitation from positive experience (Def M1a)
@@ -317,9 +320,10 @@ def run_vcms_agent(params: VCMSParams, rounds: List[PRoundData],
             if magnitude > p.acute_threshold:
                 depletion *= ACUTE_MULT
             B -= depletion
-        elif pun_recv_prev == 0:
-            # Positive experience + no punishment → B replenishes (Def M1a)
-            B += p.b_replenish_rate * experience
+        elif experience > 0:
+            # Positive experience → graduated replenishment gated by punishment
+            pun_gate = max(0.0, 1.0 - pun_recv_prev / MAX_PUNISH)
+            B += p.b_replenish_rate * experience * pun_gate
 
         # Punishment received → B depletes (separate drain, always fires)
         if i > 0:
