@@ -1,0 +1,6046 @@
+{
+  "2301": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "2302": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "2303": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "2304": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "2305": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate"
+    ]
+  },
+  "2306": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "2307": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "2308": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "2309": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "2310": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "2311": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold"
+    ]
+  },
+  "2312": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "2313": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "2314": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "2315": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 12,
+    "n_unconstrained": 6,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "2316": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "2317": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "2318": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "2319": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate"
+    ]
+  },
+  "2320": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "2321": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "2322": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "2323": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "2324": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "401": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 13,
+    "n_unconstrained": 5,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "402": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 12,
+    "n_unconstrained": 6,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold"
+    ]
+  },
+  "403": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 13,
+    "n_unconstrained": 5,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "404": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 13,
+    "n_unconstrained": 5,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "405": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "406": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "407": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "408": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 12,
+    "n_unconstrained": 6,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "409": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "410": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "411": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "412": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "413": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold"
+    ]
+  },
+  "414": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "415": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "416": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "417": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "418": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "419": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "420": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4201": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "4202": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4203": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "4204": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "4205": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "h_start"
+    ]
+  },
+  "4206": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4207": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 13,
+    "n_unconstrained": 5,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "4208": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "4209": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "421": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4210": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "4211": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": false,
+      "h_start": false
+    },
+    "n_constrained": 13,
+    "n_unconstrained": 5,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_strength",
+      "h_start"
+    ]
+  },
+  "4212": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "4213": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "4214": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "4215": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold"
+    ]
+  },
+  "4216": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "b_replenish_rate"
+    ]
+  },
+  "4217": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold"
+    ]
+  },
+  "4218": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "4219": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "422": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 12,
+    "n_unconstrained": 6,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4220": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "423": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 13,
+    "n_unconstrained": 5,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "424": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4501": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4502": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "4503": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "4504": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "4505": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "4506": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "4507": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "4508": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "4509": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "4510": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "4511": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "4512": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "4513": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4514": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "4515": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4516": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4517": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 13,
+    "n_unconstrained": 5,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "4518": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "4519": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 12,
+    "n_unconstrained": 6,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "4520": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 12,
+    "n_unconstrained": 6,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "501": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "502": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "503": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "504": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "505": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "506": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "507": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "508": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "509": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "510": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "511": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "512": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "513": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "s_thresh",
+      "h_start"
+    ]
+  },
+  "514": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "515": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh"
+    ]
+  },
+  "516": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "517": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "518": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "519": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "520": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "521": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "522": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "523": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "524": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "5901": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": false,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "v_rep",
+      "b_replenish_rate"
+    ]
+  },
+  "5902": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": false,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_strength",
+      "h_start"
+    ]
+  },
+  "5903": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": false,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_strength",
+      "h_start"
+    ]
+  },
+  "5904": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": false,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_strength",
+      "h_start"
+    ]
+  },
+  "5905": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "5906": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "5907": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "5908": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "5909": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": false,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "h_strength",
+      "h_start"
+    ]
+  },
+  "5910": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate"
+    ]
+  },
+  "5911": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "b_replenish_rate"
+    ]
+  },
+  "5912": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": false,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_strength",
+      "h_start"
+    ]
+  },
+  "5913": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "5914": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "5915": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "5916": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "601": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "602": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold"
+    ]
+  },
+  "603": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "604": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "605": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "606": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "607": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "608": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "609": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold"
+    ]
+  },
+  "610": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "611": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 12,
+    "n_unconstrained": 6,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "612": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "613": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold"
+    ]
+  },
+  "614": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "615": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "616": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "b_replenish_rate"
+    ]
+  },
+  "617": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold"
+    ]
+  },
+  "618": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 13,
+    "n_unconstrained": 5,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "619": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "620": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 13,
+    "n_unconstrained": 5,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "701": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "702": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "703": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "704": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "705": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "706": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "707": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "708": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "709": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "710": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": false,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 11,
+    "n_unconstrained": 7,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "711": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 12,
+    "n_unconstrained": 6,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "712": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "713": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "714": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "715": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": false,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "h_strength",
+      "h_start"
+    ]
+  },
+  "716": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": false,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "h_strength",
+      "h_start"
+    ]
+  },
+  "801": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "802": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "803": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "804": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate"
+    ]
+  },
+  "805": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "806": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "s_thresh"
+    ]
+  },
+  "807": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": false,
+      "p_scale": false,
+      "s_thresh": false,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 14,
+    "n_unconstrained": 4,
+    "unconstrained_params": [
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "h_start"
+    ]
+  },
+  "808": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "b_replenish_rate"
+    ]
+  },
+  "809": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate"
+    ]
+  },
+  "810": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "811": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "812": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "b_replenish_rate"
+    ]
+  },
+  "813": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 18,
+    "n_unconstrained": 0,
+    "unconstrained_params": []
+  },
+  "814": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "815": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "816": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "901": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "902": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold"
+    ]
+  },
+  "903": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "p_scale",
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "904": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "905": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "906": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "907": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "908": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "p_scale",
+      "h_start"
+    ]
+  },
+  "909": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "910": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "h_start"
+    ]
+  },
+  "911": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "912": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": true,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": true
+    },
+    "n_constrained": 17,
+    "n_unconstrained": 1,
+    "unconstrained_params": [
+      "p_scale"
+    ]
+  },
+  "913": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": false,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": false,
+      "h_start": false
+    },
+    "n_constrained": 13,
+    "n_unconstrained": 5,
+    "unconstrained_params": [
+      "p_scale",
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_strength",
+      "h_start"
+    ]
+  },
+  "914": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": true,
+      "b_replenish_rate": false,
+      "acute_threshold": true,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 16,
+    "n_unconstrained": 2,
+    "unconstrained_params": [
+      "b_replenish_rate",
+      "h_start"
+    ]
+  },
+  "915": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "916": {
+    "mask": {
+      "c_base": true,
+      "alpha": true,
+      "v_rep": true,
+      "v_ref": true,
+      "inertia": true,
+      "s_dir": true,
+      "s_rate": true,
+      "s_initial": true,
+      "s_frac": true,
+      "p_scale": true,
+      "s_thresh": true,
+      "b_initial": true,
+      "b_depletion_rate": false,
+      "b_replenish_rate": true,
+      "acute_threshold": false,
+      "facilitation_rate": true,
+      "h_strength": true,
+      "h_start": false
+    },
+    "n_constrained": 15,
+    "n_unconstrained": 3,
+    "unconstrained_params": [
+      "b_depletion_rate",
+      "acute_threshold",
+      "h_start"
+    ]
+  },
+  "_summary": {
+    "total_subjects": 196,
+    "total_cells": 3528,
+    "per_parameter": {
+      "c_base": {
+        "constrained": 196,
+        "unconstrained": 0,
+        "pct_constrained": 100.0
+      },
+      "alpha": {
+        "constrained": 196,
+        "unconstrained": 0,
+        "pct_constrained": 100.0
+      },
+      "v_rep": {
+        "constrained": 195,
+        "unconstrained": 1,
+        "pct_constrained": 99.5
+      },
+      "v_ref": {
+        "constrained": 196,
+        "unconstrained": 0,
+        "pct_constrained": 100.0
+      },
+      "inertia": {
+        "constrained": 196,
+        "unconstrained": 0,
+        "pct_constrained": 100.0
+      },
+      "s_dir": {
+        "constrained": 196,
+        "unconstrained": 0,
+        "pct_constrained": 100.0
+      },
+      "s_rate": {
+        "constrained": 196,
+        "unconstrained": 0,
+        "pct_constrained": 100.0
+      },
+      "s_initial": {
+        "constrained": 196,
+        "unconstrained": 0,
+        "pct_constrained": 100.0
+      },
+      "s_frac": {
+        "constrained": 164,
+        "unconstrained": 32,
+        "pct_constrained": 83.7
+      },
+      "p_scale": {
+        "constrained": 95,
+        "unconstrained": 101,
+        "pct_constrained": 48.5
+      },
+      "s_thresh": {
+        "constrained": 162,
+        "unconstrained": 34,
+        "pct_constrained": 82.7
+      },
+      "b_initial": {
+        "constrained": 196,
+        "unconstrained": 0,
+        "pct_constrained": 100.0
+      },
+      "b_depletion_rate": {
+        "constrained": 140,
+        "unconstrained": 56,
+        "pct_constrained": 71.4
+      },
+      "b_replenish_rate": {
+        "constrained": 143,
+        "unconstrained": 53,
+        "pct_constrained": 73.0
+      },
+      "acute_threshold": {
+        "constrained": 140,
+        "unconstrained": 56,
+        "pct_constrained": 71.4
+      },
+      "facilitation_rate": {
+        "constrained": 196,
+        "unconstrained": 0,
+        "pct_constrained": 100.0
+      },
+      "h_strength": {
+        "constrained": 187,
+        "unconstrained": 9,
+        "pct_constrained": 95.4
+      },
+      "h_start": {
+        "constrained": 67,
+        "unconstrained": 129,
+        "pct_constrained": 34.2
+      }
+    },
+    "always_constrained": [
+      "c_base",
+      "alpha",
+      "v_ref",
+      "inertia",
+      "s_dir",
+      "s_rate",
+      "s_initial",
+      "b_initial",
+      "facilitation_rate"
+    ],
+    "conditionally_constrained": [
+      "v_rep",
+      "s_frac",
+      "p_scale",
+      "s_thresh",
+      "b_depletion_rate",
+      "b_replenish_rate",
+      "acute_threshold",
+      "h_strength",
+      "h_start"
+    ],
+    "per_profile": {
+      "cooperative-enforcer": {
+        "c_base": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "alpha": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "v_rep": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "v_ref": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "inertia": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "s_dir": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "s_rate": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "s_initial": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "s_frac": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "p_scale": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "s_thresh": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "b_initial": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "b_depletion_rate": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "b_replenish_rate": {
+          "constrained": 3,
+          "pct": 27.3
+        },
+        "acute_threshold": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "facilitation_rate": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "h_strength": {
+          "constrained": 11,
+          "pct": 100.0
+        },
+        "h_start": {
+          "constrained": 1,
+          "pct": 9.1
+        }
+      },
+      "cooperator": {
+        "c_base": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "alpha": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "v_rep": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "v_ref": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "inertia": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "s_dir": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "s_rate": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "s_initial": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "s_frac": {
+          "constrained": 63,
+          "pct": 67.7
+        },
+        "p_scale": {
+          "constrained": 26,
+          "pct": 28.0
+        },
+        "s_thresh": {
+          "constrained": 63,
+          "pct": 67.7
+        },
+        "b_initial": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "b_depletion_rate": {
+          "constrained": 60,
+          "pct": 64.5
+        },
+        "b_replenish_rate": {
+          "constrained": 58,
+          "pct": 62.4
+        },
+        "acute_threshold": {
+          "constrained": 60,
+          "pct": 64.5
+        },
+        "facilitation_rate": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "h_strength": {
+          "constrained": 93,
+          "pct": 100.0
+        },
+        "h_start": {
+          "constrained": 18,
+          "pct": 19.4
+        }
+      },
+      "free-rider": {
+        "c_base": {
+          "constrained": 20,
+          "pct": 100.0
+        },
+        "alpha": {
+          "constrained": 20,
+          "pct": 100.0
+        },
+        "v_rep": {
+          "constrained": 19,
+          "pct": 95.0
+        },
+        "v_ref": {
+          "constrained": 20,
+          "pct": 100.0
+        },
+        "inertia": {
+          "constrained": 20,
+          "pct": 100.0
+        },
+        "s_dir": {
+          "constrained": 20,
+          "pct": 100.0
+        },
+        "s_rate": {
+          "constrained": 20,
+          "pct": 100.0
+        },
+        "s_initial": {
+          "constrained": 20,
+          "pct": 100.0
+        },
+        "s_frac": {
+          "constrained": 20,
+          "pct": 100.0
+        },
+        "p_scale": {
+          "constrained": 13,
+          "pct": 65.0
+        },
+        "s_thresh": {
+          "constrained": 19,
+          "pct": 95.0
+        },
+        "b_initial": {
+          "constrained": 20,
+          "pct": 100.0
+        },
+        "b_depletion_rate": {
+          "constrained": 12,
+          "pct": 60.0
+        },
+        "b_replenish_rate": {
+          "constrained": 17,
+          "pct": 85.0
+        },
+        "acute_threshold": {
+          "constrained": 12,
+          "pct": 60.0
+        },
+        "facilitation_rate": {
+          "constrained": 20,
+          "pct": 100.0
+        },
+        "h_strength": {
+          "constrained": 11,
+          "pct": 55.0
+        },
+        "h_start": {
+          "constrained": 10,
+          "pct": 50.0
+        }
+      },
+      "moderate": {
+        "c_base": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "alpha": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "v_rep": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "v_ref": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "inertia": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "s_dir": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "s_rate": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "s_initial": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "s_frac": {
+          "constrained": 51,
+          "pct": 96.2
+        },
+        "p_scale": {
+          "constrained": 33,
+          "pct": 62.3
+        },
+        "s_thresh": {
+          "constrained": 50,
+          "pct": 94.3
+        },
+        "b_initial": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "b_depletion_rate": {
+          "constrained": 44,
+          "pct": 83.0
+        },
+        "b_replenish_rate": {
+          "constrained": 47,
+          "pct": 88.7
+        },
+        "acute_threshold": {
+          "constrained": 44,
+          "pct": 83.0
+        },
+        "facilitation_rate": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "h_strength": {
+          "constrained": 53,
+          "pct": 100.0
+        },
+        "h_start": {
+          "constrained": 32,
+          "pct": 60.4
+        }
+      },
+      "volatile": {
+        "c_base": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "alpha": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "v_rep": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "v_ref": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "inertia": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "s_dir": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "s_rate": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "s_initial": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "s_frac": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "p_scale": {
+          "constrained": 12,
+          "pct": 63.2
+        },
+        "s_thresh": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "b_initial": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "b_depletion_rate": {
+          "constrained": 13,
+          "pct": 68.4
+        },
+        "b_replenish_rate": {
+          "constrained": 18,
+          "pct": 94.7
+        },
+        "acute_threshold": {
+          "constrained": 13,
+          "pct": 68.4
+        },
+        "facilitation_rate": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "h_strength": {
+          "constrained": 19,
+          "pct": 100.0
+        },
+        "h_start": {
+          "constrained": 6,
+          "pct": 31.6
+        }
+      }
+    },
+    "subject_constrainedness_distribution": {
+      "11": 13,
+      "12": 8,
+      "13": 10,
+      "14": 14,
+      "15": 26,
+      "16": 46,
+      "17": 56,
+      "18": 23
+    }
+  }
+}
