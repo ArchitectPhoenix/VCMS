@@ -172,9 +172,14 @@ def vcms_predict(target_rounds, library, exclude_sids):
     Run VCMS combined predictor, excluding specified subjects from pool.
 
     For each round:
-      1. Predict from weighted surviving candidates' v3 outputs
-      2. Observe actual
-      3. Eliminate on behavioral distance
+      1. Run v3 for all survivors on target's environment
+      2. Predict from inverse-distance-weighted v3 outputs
+      3. Observe actual
+      4. Eliminate on v3 PREDICTION accuracy (not library trajectory distance)
+
+    Key insight: elimination must score how well each candidate's v3 dynamics
+    predict the TARGET's behavior in the TARGET's environment, not how similar
+    the library trajectory is. The library trajectory was in a different group.
     """
     # Build candidate pool
     candidates = {}
@@ -183,62 +188,65 @@ def vcms_predict(target_rounds, library, exclude_sids):
             continue
         candidates[sid] = {
             'params': VCMSParams(**rec['v3_params']),
-            'actual_c': rec['contribution_trajectory'],
-            'actual_p': rec.get('punishment_sent_trajectory', [0] * N_ROUNDS),
         }
 
     survivors = list(candidates.keys())
     pred_c_list = []
     obs_c_list = []
-    obs_p_list = []
+    # Track each candidate's v3 predictions on the target's environment
+    cand_pred_history = {sid: [] for sid in candidates}
     distances = {}
 
     n = min(N_ROUNDS, len(target_rounds))
 
     for t in range(n):
+        # Run v3 for all survivors on target's environment
+        cand_preds_c = {}
         if t == 0:
-            # R1: library mean as prior
-            pc = int(round(np.mean([
-                candidates[s]['actual_c'][0] for s in survivors])))
+            # R1: v3 can't predict without prior rounds; use R1 from v3 init
+            for sid in survivors:
+                result = run_vcms_agent(
+                    candidates[sid]['params'], target_rounds[:1])
+                cand_preds_c[sid] = result['pred_contrib'][0]
+                cand_pred_history[sid].append(result['pred_contrib'][0])
         else:
-            # Run v3 for each survivor on target's environment
-            cand_preds = {}
             for sid in survivors:
                 result = run_vcms_agent(
                     candidates[sid]['params'], target_rounds[:t + 1])
-                cand_preds[sid] = result['pred_contrib'][t]
+                cand_preds_c[sid] = result['pred_contrib'][t]
+                # Store full prediction history for this candidate
+                cand_pred_history[sid] = list(result['pred_contrib'][:t + 1])
 
-            # Inverse-distance weighting
-            weights = {}
-            for sid in survivors:
-                d = distances.get(sid, 0.0)
-                weights[sid] = 1.0 / (d + 0.001)
-            total_w = sum(weights.values())
+        # Weighted prediction
+        if not distances:
+            # First round or no distances yet: equal weights
+            weights = {sid: 1.0 for sid in survivors}
+        else:
+            weights = {sid: 1.0 / (distances.get(sid, 0.0) + 0.001)
+                       for sid in survivors}
+        total_w = sum(weights.values())
 
-            pc = 0.0
-            for sid in survivors:
-                pc += (weights[sid] / total_w) * cand_preds[sid]
-            pc = int(round(pc))
+        pc = 0.0
+        for sid in survivors:
+            pc += (weights[sid] / total_w) * cand_preds_c[sid]
+        pred_c_list.append(int(round(pc)))
 
-        pred_c_list.append(pc)
-
-        # Observe
+        # Observe actual
         obs_c_list.append(target_rounds[t].contribution)
-        obs_p_list.append(target_rounds[t].punishment_sent_total)
 
-        # Eliminate on behavioral distance
+        # Eliminate on v3 PREDICTION accuracy (how well did this candidate's
+        # dynamics predict the target's actual behavior in the target's env?)
         new_distances = {}
         for sid in survivors:
-            lib_c = candidates[sid]['actual_c']
-            lib_p = candidates[sid]['actual_p']
-            nc = min(t + 1, len(lib_c))
-            c_d = sum((obs_c_list[i] - lib_c[i]) ** 2
+            hist = cand_pred_history[sid]
+            nc = min(t + 1, len(hist))
+            if nc == 0:
+                new_distances[sid] = 0.0
+                continue
+            # MSE between candidate's v3 predictions and target's actual C
+            c_d = sum((obs_c_list[i] - hist[i]) ** 2
                       for i in range(nc)) / (MAX_CONTRIB ** 2 * nc)
-            np_ = min(t + 1, len(lib_p), len(obs_p_list))
-            p_d = (sum((obs_p_list[i] - lib_p[i]) ** 2
-                       for i in range(np_)) / (MAX_PUNISH ** 2 * np_)
-                   if np_ > 0 else 0.0)
-            new_distances[sid] = math.sqrt(c_d + 2.0 * p_d)
+            new_distances[sid] = math.sqrt(c_d)
 
         if new_distances:
             best = min(new_distances.values())
