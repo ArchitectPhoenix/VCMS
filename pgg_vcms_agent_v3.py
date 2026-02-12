@@ -281,39 +281,49 @@ def run_vcms_agent(params: VCMSParams, rounds: List[PRoundData],
         # STEP 3: B — BUDGET UPDATE
         # Canon: D16 (B ∈ ℝ⁺), Theorem M8 (gradient), M5A/B (pathways)
         #
-        # Unified experience signal: cooperation context + punishment
-        #   experience = (group cooperation - own contribution - punishment received)
-        #   experience > 0 → net positive (unpunished free-riding or cooperative match)
-        #   experience < 0 → net negative (exploitation, or punishment makes defection costly)
+        # Experience signal: how well did the group treat me?
+        #   experience = v_group_raw - c_prev_norm
+        #   experience > 0 → others cooperated more than me (positive)
+        #   experience < 0 → I cooperated more than them (exploitation)
+        #
+        # Gated replenishment: punishment blocks facilitation.
+        #   Replenishment requires BOTH positive experience AND no punishment.
+        #   Any punishment drowns out the positive environmental signal.
         #
         # Semantics for all cases:
-        #   Cooperator in cooperative group, no pun: experience ≈ 0 (stable)
-        #   Cooperator in defecting group:           experience < 0 (exploitation → deplete)
-        #   Defector punished:                       experience < 0 (punishment costs → deplete)
-        #   Defector unpunished:                     experience > 0 (free-riding works → replenish)
+        #   Cooperator, cooperative group, no pun:  exp > 0, no pun → replenish  ✓
+        #   Cooperator, defecting group:            exp < 0 → deplete (acute)    ✓
+        #   Defector, punished:                     exp > 0, but pun gate → drain ✓
+        #   Defector, NOT punished:                 exp > 0, no pun → replenish  ✓
+        #   Cooperator, antisocially punished:      exp ≈ 0, pun gate → drain    ✓
         #
-        # Depletion: cumulative from negative experience (M5B), acute from shocks (M5A)
+        # Depletion: cumulative from exploitation (M5B), acute from shocks (M5A)
         # Replenishment: facilitation from positive experience (Def M1a)
+        # Punishment: separate drain, always fires (strain event)
         # =================================================================
 
         if i > 0:
-            experience = v_group_raw - c_prev_norm - (pun_recv_prev / 15.0)
+            experience = v_group_raw - c_prev_norm
         else:
             experience = 0.0
 
         b_pre = B
 
         if experience < 0:
-            # Negative experience → B depletes
+            # Exploitation → B depletes
             magnitude = abs(experience)
             depletion = p.b_depletion_rate * magnitude
             # Acute pathway: step-function amplification (Theorem M5A)
             if magnitude > p.acute_threshold:
                 depletion *= ACUTE_MULT
             B -= depletion
-        else:
-            # Positive experience → B replenishes (Def M1a: facilitation)
+        elif pun_recv_prev == 0:
+            # Positive experience + no punishment → B replenishes (Def M1a)
             B += p.b_replenish_rate * experience
+
+        # Punishment received → B depletes (separate drain, always fires)
+        if i > 0:
+            B -= p.b_depletion_rate * (pun_recv_prev / 15.0)
 
         B = max(0.0, B)
 
