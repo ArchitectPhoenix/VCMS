@@ -13,18 +13,18 @@ Key adapter mapping:
 With IPD_CONFIG (max_contrib=1), the engine's output adapter naturally
 thresholds: round(c_out_norm * 1) = 0 (defect) or 1 (cooperate).
 
-Payoff matrix (standard):
+Payoff matrix (experimental data: Herrmann et al.):
   CC = (3,3)   Mutual cooperation
-  CD = (0,5)   Sucker / Temptation
-  DC = (5,0)   Temptation / Sucker
+  CD = (0,4)   Sucker / Temptation
+  DC = (4,0)   Temptation / Sucker
   DD = (1,1)   Mutual defection
 
-  R=3 (reward), T=5 (temptation), S=0 (sucker), P=1 (punishment)
+  R=3 (reward), T=4 (temptation), S=0 (sucker), P=1 (punishment)
   Satisfies T > R > P > S and 2R > T + S
 
 Usage:
-    from ipd_loader import load_ipd_csv, IPDRound
-    data = load_ipd_csv('path/to/csv')
+    from ipd_loader import load_ipd_experiment, IPDRound
+    data = load_ipd_experiment('IPD-rand.csv')
     for sid, rounds in data.items():
         for rd in rounds:
             print(rd.contribution, rd.others_mean, rd.payoff)
@@ -38,7 +38,7 @@ from typing import Dict, List, Optional, Tuple
 
 # Standard IPD payoff matrix
 PAYOFF_R = 3  # Reward (mutual cooperation)
-PAYOFF_T = 5  # Temptation (defect while partner cooperates)
+PAYOFF_T = 4  # Temptation (defect while partner cooperates)
 PAYOFF_S = 0  # Sucker (cooperate while partner defects)
 PAYOFF_P = 1  # Punishment (mutual defection)
 
@@ -127,6 +127,7 @@ def load_ipd_csv(csv_path: str,
                  payoff_col: Optional[str] = 'payoff',
                  cooperate_value: str = 'C',
                  defect_value: str = 'D',
+                 delimiter: str = ',',
                  ) -> Dict[str, List[IPDRound]]:
     """
     Load IPD data from CSV.
@@ -141,7 +142,7 @@ def load_ipd_csv(csv_path: str,
     Set cooperate_value/defect_value to match your data.
     """
     with open(csv_path) as f:
-        reader = csv.DictReader(f)
+        reader = csv.DictReader(f, delimiter=delimiter)
         rows = list(reader)
 
     if not rows:
@@ -289,6 +290,25 @@ def load_ipd_action_matrix(csv_path: str,
     return data
 
 
+def load_ipd_experiment(csv_path: str) -> Dict[str, List[IPDRound]]:
+    """
+    Load IPD experimental data (IPD-rand.csv or fix.csv format).
+
+    Convenience wrapper with column mapping for the semicolon-delimited
+    experimental data files.
+    """
+    return load_ipd_csv(
+        csv_path,
+        subject_col='player',
+        round_col='round',
+        action_col='action_player',
+        partner_action_col='action_opponent',
+        partner_id_col='opponent',
+        payoff_col='payoff',
+        delimiter=';',
+    )
+
+
 # ================================================================
 # IPD BASELINES
 # ================================================================
@@ -312,7 +332,7 @@ def win_stay_lose_shift(rounds: List[IPDRound]) -> List[int]:
             preds.append(1)  # cooperate first
         else:
             last_payoff = rounds[i - 1].payoff
-            if last_payoff >= PAYOFF_R:  # R=3 or T=5 → good outcome
+            if last_payoff >= PAYOFF_R:  # R=3 or T=4 → good outcome
                 preds.append(rounds[i - 1].contribution)  # stay
             else:  # S=0 or P=1 → bad outcome
                 preds.append(1 - rounds[i - 1].contribution)  # shift
