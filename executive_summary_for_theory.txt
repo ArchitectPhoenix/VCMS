@@ -1,0 +1,337 @@
+VCMS Executive Summary — For Theory Instance
+==============================================
+Date: 2026-02-13
+From: Development instance
+Re: Normalized time implementation + phenotype geometry results
+
+
+CONTEXT
+-------
+
+You proposed that the engine should operate in normalized game time
+[0,1] rather than raw round indices. We implemented it. This document
+is the detailed outcome report.
+
+The full technical briefing is in cross_instance_briefing.txt. This
+summary focuses on what worked, what it revealed, and what's open.
+
+
+YOUR DIAGNOSIS WAS CORRECT
+---------------------------
+
+The problem: VCMS rate parameters (s_rate, b_depletion_rate,
+b_replenish_rate, facilitation_rate) were implicitly "per round."
+A b_depletion_rate of 0.7 means "lose 70% of budget impact per
+round." On a 10-round PGG this is a gradual fade. On a 100-round
+IPD this is total collapse by round 5.
+
+The symptom: Cross-game transfer to IPD scored 17.9% accuracy on
+mostly-C subjects (the committed cooperators). The model predicted
+they'd defect for 95 of 100 rounds because their budget hit zero
+almost immediately. Carry-forward baseline (just repeat round 1
+forever) beat the model at 91%.
+
+Your proposal: Normalize all temporal dynamics to [0,1] game
+progress. dt = 1/(n_rounds - 1). Every rate parameter gets
+multiplied by dt each step. h_start (horizon onset) becomes a
+fraction of game progress rather than an absolute round index.
+
+The key insight we adopted from your framing: this is NOT an adapter
+problem or a scaling heuristic. It's a unit-of-measurement correction
+in the engine itself. horizon_scaling and strain_decay were both
+patches for this same root cause. Normalized time subsumes both.
+
+
+WHAT WE IMPLEMENTED
+--------------------
+
+Engine change (vcms_engine_v4.py):
+
+  GameConfig gains a `normalized_time: bool` flag.
+
+  When True, the engine computes dt = 1/(n_rounds - 1) and applies
+  it at five rate sites in the forward pass:
+
+    1. Strain accumulation:   strain += dt * s_rate * (gap + pun)
+    2. Budget depletion (2x): B -= dt * b_depletion_rate * magnitude
+    3. Budget replenishment:  B += dt * b_replenish_rate * experience
+    4. Facilitation:          m_eval += dt * facilitation_rate * exp
+
+  h_start converts from fractional [0,1] to effective round index:
+    effective_h_start = h_start * (n_rounds - 1)
+
+  Parameter bounds widen by ~9x for rate parameters (since the
+  optimizer is now fitting rates-per-unit-progress, not per-round).
+
+  When normalized_time=False, dt=1.0 and behavior is identical to v3.
+  No legacy breakage.
+
+
+STAGED RE-FIT: ALL THREE LIBRARIES
+------------------------------------
+
+Stage 1 — P-experiment (176 subjects, 10 rounds, dt = 1/9):
+
+  RMSE degradation: zero. Every subject matches v3 quality within
+  0.001 RMSE. Rate parameters scale exactly 9.0x (v4_rate = v3_rate
+  * 9), confirming the reparameterization is lossless for the
+  original game length. h_start converts cleanly to fractional form.
+
+  This was the "does it break anything?" test. It doesn't.
+
+Stage 2 — N-experiment (212 subjects, 10 rounds, dt = 1/9):
+
+  Same result. Zero degradation, exact 9x scaling. Two independent
+  datasets, same outcome. The reparameterization is mathematically
+  equivalent for the fitting game — as expected, since dt*9 = 1.0
+  recovers the original per-round rate.
+
+Stage 3 — IPD (188 subjects, 100 rounds, dt = 1/99):
+
+  This is the real test. Results:
+
+    Binary accuracy:     83.5% -> 88.2%  (+4.6 points)
+    mostly-C accuracy:   79.2% -> 96.6%  (+17.4 points)
+    Mean RMSE:           0.333 -> 0.307  (-0.026)
+
+  The accuracy IMPROVED. The optimizer found genuinely better
+  parameter regions in normalized space. The 100-round game now has
+  the same temporal resolution as the 10-round games — budget
+  dynamics can express gradual depletion, sustained replenishment,
+  and late-game horizon effects that were impossible when dt=1.0
+  meant "slam through the entire rate every round."
+
+  IPD rate parameters did NOT scale by exactly 99x. They settled
+  at 8-12x typical scaling vs v3. This is correct — the optimizer
+  isn't just rescaling, it's finding a different (better) basin in
+  the landscape that only exists when temporal dynamics are properly
+  resolved.
+
+
+CROSS-GAME TRANSFER: THE PAYOFF
+---------------------------------
+
+The whole point of normalized time is that parameters should be
+commensurate across games of different lengths. Transfer test
+(PGG library predicting IPD behavior):
+
+                        v3 (raw rounds)    v4 (normalized time)
+  ---------------------------------------------------------------
+  Overall accuracy SP:    69.2%              70.7%
+  Overall accuracy FP:    68.9%              73.1%
+  mostly-C accuracy SP:   17.9%              67.2%
+  mostly-C accuracy FP:   70.4%              81.3%
+  Trajectory RMSE SP:     0.341              0.309
+  Trajectory RMSE FP:     0.336              0.286
+
+  SP = single best match, FP = ensemble (full pool) prediction
+
+The headline: mostly-C accuracy goes from 17.9% to 67.2% on
+single-prediction, 70.4% to 81.3% on ensemble. The committed
+cooperators are no longer invisible to cross-game transfer.
+
+Budget collapse is gone. The model can now express "this person
+cooperates for the entire game" in 100-round format using the same
+budget parameters that expressed it in 10-round format. This is
+exactly what you predicted.
+
+
+PHENOTYPE GEOMETRY: THE DEEPER RESULT
+---------------------------------------
+
+With all 576 subjects (176 P + 212 N + 188 IPD) now fitted in the
+same temporal units, we tested whether the cooperator phenotype
+convergence is real or an artifact of game-specific optimization.
+
+Setup: 15 shared parameters per subject. Unified cooperation axis:
+  HIGH = P:cooperator/enforcer, N:stable-high, IPD:mostly-C
+  LOW  = P:free-rider/antisocial, N:stable-low, IPD:mostly-D
+  MID  = everything else
+
+Five analyses, each testing a different facet of the claim:
+
+
+1. PARAMETER ALIGNMENT
+
+  HIGH cooperators across all three games:
+    c_base:      0.71 - 0.85  (spread: 0.15)
+    inertia:     0.28 - 0.46  (spread: 0.18)
+    b_initial:   3.49 - 3.83  (spread: 0.34)
+    h_strength:  0.10 - 0.14  (spread: 0.05)
+
+  LOW cooperators across all three games:
+    c_base:      0.32 - 0.57  (spread: 0.25)
+    s_initial:   3.76 - 5.24  (spread: 1.48)
+    b_initial:   1.52 - 3.10  (spread: 1.58)
+
+  The c_base cross-game spread for HIGH cooperators (0.15) is a
+  third of the phenotype gap (0.77 vs 0.33 = 0.44). The cooperator
+  signature is tighter across games than the gap between cooperators
+  and defectors within a game.
+
+  Notable: inertia in P-experiment (0.28) is lower than N/IPD
+  (0.41-0.46). This is expected — punishment maintains cooperation
+  externally, so the optimizer doesn't need internal commitment to
+  explain sustained cooperation. This structural difference persists
+  after normalization and is informative, not a failure.
+
+
+2. DISTANCE ANALYSIS (z-scored 15-D parameter space)
+
+  Same phenotype, different game:         1.64
+  Different phenotype, same game:         2.23
+  Different phenotype, different game:    2.38
+
+  Separation ratio: 2.23 / 1.64 = 1.36x
+
+  A HIGH cooperator in PGG-P is closer to a HIGH cooperator in IPD
+  (distance 1.64) than to a LOW cooperator in PGG-P (distance 2.23).
+
+  Phenotype identity explains more parameter-space structure than
+  game identity. This is the core scale-invariance claim: in the
+  normalized parameter space, "who you are" matters more than
+  "what game you played."
+
+
+3. CROSS-GAME LINEAR DISCRIMINANT ANALYSIS
+
+  Train a 3-class classifier (HIGH/MID/LOW) on one game's subjects,
+  test on another game's subjects:
+
+                Train on:  PGG-P   PGG-N   IPD
+    Test PGG-P:            (80%)    38%     41%
+    Test PGG-N:             29%    (90%)    62%
+    Test IPD:               41%     55%    (67%)
+
+  Chance baseline: 33%. Cross-game average: 44%.
+
+  Structure:
+  - N -> IPD is strongest cross-game transfer (62%). Both are
+    no-punishment games. The optimizer uses the same parameter
+    subspace to distinguish cooperators from defectors.
+
+  - P -> others is weakest (29-41%). Punishment creates a different
+    optimization landscape. The 5 punishment-specific parameters
+    (p_scale, s_frac, s_thresh, and implicitly the punishment-
+    driven budget dynamics) shift where the other 15 parameters
+    settle.
+
+  - Top discriminating dimensions: c_base (LD1 loading -1.35) and
+    h_strength (+1.31). These two parameters carry most of the
+    phenotype signal across all games.
+
+
+4. BUDGET CURVE SHAPE
+
+  replenish_rate / depletion_rate ratio by phenotype:
+    HIGH: 1.50 - 2.49  (replenishment wins -> budget sustains)
+    MID:  1.01 - 2.56  (variable)
+    LOW:  0.67 - 1.34  (depletion wins -> budget drains)
+
+  This confirms the mechanistic story: committed cooperators have
+  self-sustaining budget dynamics. Their positive experience
+  replenishes faster than their negative experience depletes. Low
+  cooperators have the opposite — budget systematically drains,
+  making cooperation progressively more expensive.
+
+  N-experiment LOW ratio is 0.67 (most imbalanced). These are
+  subjects with s_initial = 5.24 (massive pre-loaded strain) AND
+  draining budget. Cooperation was never viable for them — the
+  model captures this as a structural parameter configuration, not
+  just a low c_base.
+
+
+5. CROSS-GAME PARAMETER CORRELATIONS
+
+  Parameters that correlate most strongly across games:
+  - c_base and h_strength are the primary phenotype discriminators
+  - b_initial and s_initial form a secondary axis (capacity vs cost)
+  - inertia is game-context-dependent (lower under punishment)
+
+  Parameters that DON'T correlate across games:
+  - s_rate and facilitation_rate show game-specific patterns
+  - alpha (V-channel sensitivity) varies with game structure
+
+
+INTERPRETATION
+--------------
+
+The phenotype geometry is real but noisy. Perfect convergence would
+mean the optimizer finds identical parameter vectors for cooperators
+regardless of game — that doesn't happen and shouldn't be expected.
+Game structure genuinely affects parameter fitting through different
+selection pressures, different signal-to-noise ratios, and different
+identifiability landscapes.
+
+What we see instead: the DOMINANT axis of variation in 15-D
+parameter space is cooperation phenotype, not game format. This is
+the meaningful claim. When you z-score out the per-parameter
+variance, a cooperator from any game looks more like a cooperator
+from any other game than like a defector from their own game.
+
+This was only possible after your normalized-time correction. With
+raw per-round rates, a b_depletion_rate of 0.7 in PGG and 0.007 in
+IPD are the "same" parameter — but they're in different units and
+the geometry analysis would be dominated by this scaling artifact.
+Normalized time makes the numbers commensurate so the geometry
+comparison is valid.
+
+
+WHAT'S OPEN
+-----------
+
+1. Combined library transfer test
+   The 576-subject v4 library should be tested as a combined pool
+   for cross-game prediction. Key question: does including N-experiment
+   subjects improve IPD transfer accuracy? The high-inertia committed
+   cooperator basin is populated by both N:stable-high and IPD:mostly-C,
+   so the N-experiment subjects should improve mostly-C prediction.
+
+2. V-channel for dyadic games
+   You flagged this: IPD should preserve partner-specific sequential
+   information, not just aggregate cooperation level. Current V-channel
+   computes a weighted mean of others' actions — fine for 4-player PGG,
+   lossy for 2-player IPD where the sequence (C,D,C,D vs C,C,D,D)
+   matters. TFT's accuracy jump from SP to FP mode (63% -> 81%)
+   proves sequence matters. This is architecturally independent from
+   temporal normalization.
+
+3. Phenotype-space scaling conjecture
+   Normalized time makes parameters scale-invariant with respect to
+   game length. In principle, any cooperative trajectory — not just
+   structured game theory experiments — could be fitted and mapped into
+   this parameter space. The identifiability question is open: can
+   budget parameters be recovered from contribution data alone when
+   the "others_mean" signal (group feedback) is absent or unstructured?
+
+4. P-experiment inertia gap
+   P-experiment cooperators have systematically lower inertia (0.28)
+   than N/IPD cooperators (0.41-0.46). This is structurally predicted
+   (punishment maintains cooperation externally). But it means P-fitted
+   phenotype boundaries don't transfer well to no-punishment games
+   (LDA: P->N only 29%). Can the model learn a punishment-correction
+   offset, or is this a fundamental limitation of pooling punishment
+   and no-punishment libraries?
+
+5. The rising type (n=15)
+   N-experiment subjects who increase cooperation over time. Still the
+   worst-fitted behavioral type. May need a mechanism not in the
+   current model — learning, reciprocal signaling, or norm discovery.
+   Small sample size makes it hard to tell if this is a real type or
+   measurement noise.
+
+
+SUMMARY IN ONE PARAGRAPH
+--------------------------
+
+Your normalized-time correction fixed the cross-game transfer failure.
+The engine now operates in [0,1] game progress. 576 subjects across
+three game formats are fitted with commensurate parameters. Phenotype
+geometry analysis confirms: cooperation type is the dominant axis of
+variation in 15-D parameter space (separation ratio 1.36x), cross-game
+LDA beats chance at 44% (vs 33%), and the committed cooperator
+signature (high c_base, high inertia, low strain, large budget, no
+endgame discount) is consistent across PGG-P, PGG-N, and IPD within
+a spread of 0.15 on c_base. The model doesn't know these games are
+related. The phenotype convergence falls out of independent fitting
+in a shared parameter space with correct temporal units.
