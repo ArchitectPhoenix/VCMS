@@ -12,9 +12,14 @@ Changes from v3:
      (Book 1 Ch 4 §4.3 — Discharge requires payable action path)
   4. Optional V-bandwidth scaling: fewer signals → faster alpha
      (Book 1 Ch 2 §2.3 — High visibility couples action to consequence)
+  5. Strain decay: habituation preventing runaway accumulation in long games
+     (Book 1 Ch 2 — repeated exposure reduces strain impact)
+  6. Horizon scaling: h_start proportional to game length, not absolute round
+  7. Ensemble elimination parameters in GameConfig for game-adapted selection
 
 Backward compatibility:
   s_exploitation_rate=0, v_self_weight=0, PGG_P_CONFIG → identical to v3
+  strain_decay=0, horizon_scaling=False → identical to v4.0
 
 New parameters (20 total = 18 from v3 + 2 new):
   v_self_weight:       Self-state visibility (0=oblivious, 1=fully aware) [0,1]
@@ -24,6 +29,9 @@ Game-specific (adapter, via GameConfig):
   has_punishment:       Whether discharge pathway exists
   use_bandwidth_scaling: Whether alpha adapts to V-channel count
   n_signals:            Number of independent information channels
+  strain_decay:         Per-round strain decay rate (habituation)
+  horizon_scaling:      Scale h_start proportionally to game length
+  elim_floor/elim_mult: Ensemble elimination tuning for action space
 """
 
 import math
@@ -67,6 +75,11 @@ class GameConfig:
     n_signals: int = 4                   # V-channel bandwidth (independent info channels)
     use_bandwidth_scaling: bool = False  # Scale alpha by channel bandwidth?
     reference_signals: int = 4           # Baseline signal count for bandwidth scaling
+    strain_decay: float = 0.0           # Per-round strain decay (0 = no decay, habituation)
+    horizon_scaling: bool = False        # Scale h_start proportionally to game length?
+    reference_rounds: int = 10           # Reference game length for horizon scaling
+    elim_floor: float = 0.5             # Ensemble elimination distance floor
+    elim_mult: float = 3.0              # Ensemble elimination distance multiplier
 
 
 # Pre-configured adapters for standard games
@@ -278,6 +291,12 @@ def run_vcms_v4(params: VCMSParams, rounds, game_config: GameConfig,
     # Compute effective alpha (bandwidth scaling)
     effective_alpha = _bandwidth_scale(p.alpha, gc)
 
+    # Compute effective h_start (horizon scaling for longer games)
+    if gc.horizon_scaling and gc.reference_rounds > 0:
+        effective_h_start = p.h_start * (len(rounds) / gc.reference_rounds)
+    else:
+        effective_h_start = p.h_start
+
     # === Internal state ===
     v_level = 0.0
     disposition = 0.0
@@ -353,6 +372,10 @@ def run_vcms_v4(params: VCMSParams, rounds, game_config: GameConfig,
 
         # Total strain accumulation
         strain += p.s_rate * (gap_strain + pun_strain) + s_exploitation
+
+        # Strain decay (habituation — prevents runaway in long games)
+        if gc.strain_decay > 0:
+            strain *= (1.0 - gc.strain_decay)
 
         rt['s_accum'] = {
             'gap': gap, 'directed_gap': directed_gap,
@@ -438,7 +461,7 @@ def run_vcms_v4(params: VCMSParams, rounds, game_config: GameConfig,
         # =============================================================
         # STEP 7: OUTPUT C — via output adapter
         # =============================================================
-        h_factor = _horizon_factor(i, len(rounds), p.h_strength, p.h_start)
+        h_factor = _horizon_factor(i, len(rounds), p.h_strength, effective_h_start)
         c_out_norm = max(0.0, min(1.0, c_norm)) * affordability * h_factor
         c_out = round(c_out_norm * gc.max_contrib)
         c_out = max(0, min(gc.max_contrib, c_out))
