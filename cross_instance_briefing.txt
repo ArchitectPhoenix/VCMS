@@ -251,32 +251,190 @@ parameters, and the cooperator phenotypes align across contexts
 without the model being told the games are related.
 
 
-OPEN QUESTIONS
---------------
+UPDATE: NORMALIZED GAME TIME
+-----------------------------
+(Added after theory instance identified temporal unit mismatch)
 
-- Transfer prediction: With the combined 596-subject library, how
-  does cross-game prediction perform? (Fit on PGG, predict IPD
-  and vice versa.)
+PROBLEM: Budget parameters fitted on 10-round PGG games collapsed
+when run on 100-round IPD games. b_depletion_rate of 0.7 means
+"lose 70% of B-impact per round" — over 10 rounds that's gradual
+decline, over 100 rounds it's instant collapse.
 
-- Phenotype stability: Are the parameter clusters (committed
-  cooperator, comfortable defector, disillusioned cooperator)
-  stable under different fitting initializations?
+FIX: Engine now supports normalized game time. When enabled,
+dt = 1/(n_rounds-1) per step. All temporal rates (s_rate,
+b_depletion_rate, b_replenish_rate, facilitation_rate) are
+multiplied by dt each step. h_start operates in [0,1] game
+progress rather than absolute round index.
 
-- The rising type (n=15): These subjects increase cooperation over
-  time in N-experiment. The current model fits them worst
-  (RMSE=2.94). Is there a missing mechanism (learning? reciprocal
-  signaling?) or is 15 subjects just too few to tell?
+This subsumes two earlier patches (horizon_scaling, strain_decay)
+that were workarounds for the same temporal unit mismatch.
 
-- v_self_weight and s_exploitation_rate (v4-only parameters):
-  Currently fixed at 0. Are there games where they matter?
+RE-FIT RESULTS:
+
+  P-experiment (176 subjects, dt=1/9):
+    Zero RMSE degradation. Rate parameters scale exactly 9.0x.
+    Every subject matches v3 quality within 0.001 RMSE.
+
+  N-experiment (212 subjects, dt=1/9):
+    Zero RMSE degradation. Same exact 9x scaling.
+
+  IPD (188 subjects, dt=1/99):
+    Fitting accuracy improves 83.5% → 88.2% (+4.6%).
+    mostly-C accuracy: 96.6%. Budget can now sustain
+    100-round cooperation.
+
+IPD TRANSFER WITH NORMALIZED TIME:
+
+  mostly-C accuracy: 17.9% → 67.2% (SP), 70.4% → 81.3% (FP)
+  Overall accuracy:  69.2% → 70.7% (SP), 68.9% → 73.1% (FP)
+  Trajectory RMSE:   0.341 → 0.309 (SP), 0.336 → 0.286 (FP)
+
+  Budget no longer collapses on 100-round games. The temporal
+  normalization specifically fixes the committed cooperator
+  failure mode identified by the theory instance.
 
 
-FILES
------
+UPDATE: PHENOTYPE GEOMETRY ANALYSIS
+-------------------------------------
+(576 subjects × 15 parameters × 3 games, all normalized time)
 
-  vcms_engine_v4.py          — Unified engine with GameConfig adapter
-  v3_library_fitted.json     — 196 PGG-P subjects
-  n_library_fitted.json      — 212 PGG-N subjects
-  ipd_library_fitted.json    — 188 IPD subjects
-  ipd_fit.py                 — Fast forward pass + DE optimizer
-  n_experiment_fit.py        — N-experiment fitting (reuses ipd_fit pass)
+THE QUESTION: Do cooperator phenotypes converge to the same
+parameter-space region across games, or was the alignment an
+artifact of game-specific fitting?
+
+METHOD: Unified cooperation axis:
+  HIGH: P:cooperator+enforcer, N:stable-high, IPD:mostly-C
+  LOW:  P:free-rider+antisocial, N:stable-low, IPD:mostly-D
+  MID:  everything else
+
+RESULT 1 — ALIGNMENT TABLE (mean parameter values):
+
+                    PGG-P   PGG-N   IPD    spread
+  HIGH cooperators:
+    c_base           0.77    0.85   0.71    0.15
+    inertia          0.28    0.46   0.41    0.18
+    s_initial        0.77    0.15   0.72    0.63
+    b_initial        3.49    3.83   3.49    0.34
+    h_strength       0.10    0.11   0.14    0.05
+
+  LOW cooperators:
+    c_base           0.33    0.32   0.57    0.25
+    inertia          0.22    0.23   0.35    0.13
+    s_initial        3.76    5.24   3.76    1.48
+    b_initial        2.32    1.52   3.10    1.58
+    h_strength       0.63    0.39   0.50    0.24
+
+The signature holds: high cooperators converge on high c_base,
+high inertia, low s_initial, high b_initial, low h_strength.
+Low cooperators converge on the opposite. The cross-game spread
+on c_base (0.15 for HIGH) is much smaller than the phenotype gap
+(0.77 HIGH vs 0.33 LOW = 0.44 difference).
+
+RESULT 2 — DISTANCE ANALYSIS (z-scored parameter space):
+
+  Same phenotype, cross-game centroid distance:    1.64
+  Different phenotype, same game centroid distance: 2.23
+  Different phenotype, cross-game:                 2.38
+
+  Separation ratio: 1.36x
+
+  Phenotype identity explains MORE of the parameter-space structure
+  than game identity. A high cooperator in PGG-P is closer to a
+  high cooperator in IPD than to a low cooperator in PGG-P.
+
+RESULT 3 — CROSS-GAME DISCRIMINANT ANALYSIS:
+
+  Train on one game, classify subjects from another:
+
+                 Train→   PGG-P   PGG-N   IPD
+    Test PGG-P:           (80%)    38%    41%
+    Test PGG-N:            29%    (90%)   62%
+    Test IPD:              41%     55%   (67%)
+
+  Chance baseline: 33%. Cross-game accuracy averages 44%.
+
+  N→IPD transfer is strongest (62%) — consistent with both being
+  no-punishment games with the same V-channel structure.
+
+  P→others is weakest (29-41%) — punishment creates a different
+  selection pressure on parameters, so the P-experiment phenotype
+  boundaries don't map cleanly to no-punishment games.
+
+  Top discriminating parameters (LD1 loadings):
+    c_base (-1.35) and h_strength (+1.31) carry most of the
+    phenotype signal. s_initial, v_ref, and inertia contribute.
+
+RESULT 4 — BUDGET CURVE SHAPE:
+
+  Replenish/deplete ratio by phenotype:
+    HIGH: 1.50-2.49 across games (replenish > deplete)
+    MID:  1.01-2.56 (variable)
+    LOW:  0.67-1.34 (deplete ≥ replenish)
+
+  N-experiment LOW cooperators have ratio 0.67 — budget
+  systematically drains. This is the "disillusioned cooperator"
+  mechanism: they want to cooperate (c_base=0.32 is low but
+  s_initial=5.24 is the real story — massive pre-loaded strain)
+  and their budget can't sustain it.
+
+INTERPRETATION:
+
+The phenotype geometry is real but noisy. The clusters don't
+collapse onto each other perfectly — game context still matters.
+But the dominant axis of variation in 15-dimensional parameter
+space is cooperation type, not game format. This is the
+scale-invariance claim: normalized time makes the parameter
+space commensurate, and in that commensurate space, cooperators
+look like cooperators regardless of whether the game had 10
+rounds, 100 rounds, punishment, or binary actions.
+
+The weakest link is P→others transfer. Punishment creates a
+structurally different optimization landscape (s_frac, s_thresh,
+p_scale are all active) that shifts where the other 15 parameters
+settle. This is why the P-experiment library was a poor starting
+point for N-experiment prediction — it's not just missing the
+high-inertia cooperator, it's fitting parameters under a different
+constraint set.
+
+
+OPEN QUESTIONS (UPDATED)
+-------------------------
+
+- Combined library transfer: The full 576-subject v4 library
+  in normalized time should be tested for combined cross-game
+  prediction. Particularly: does adding N-experiment subjects
+  to the P-experiment library improve IPD transfer?
+
+- The rising type (n=15): Still the hardest to fit. May need
+  a learning/reciprocity mechanism not in the current model.
+
+- V-channel for dyadic games: Theory instance noted that IPD
+  should preserve partner-specific sequential information, not
+  just aggregate cooperation level. TFT's 63%→81% jump on FP
+  proves partner sequence matters. This is architecturally
+  independent from temporal normalization.
+
+- Parameter-space phenotyping of non-experimental data:
+  Normalized time makes parameters scale-invariant. In principle,
+  any cooperative trajectory (regardless of time granularity) can
+  be fitted and mapped into the same parameter space. The question
+  is identifiability: can budget parameters be recovered from
+  contribution data alone, without the others_mean signal?
+
+
+FILES (UPDATED)
+---------------
+
+  vcms_engine_v4.py              — Engine with normalized_time support
+  v4_library_fitted.json         — 176 PGG-P subjects (normalized time)
+  v4_n_library_fitted.json       — 212 PGG-N subjects (normalized time)
+  v4_ipd_library_fitted.json     — 188 IPD subjects (normalized time)
+  normalized_fit.py              — Shared fast forward pass + fitting
+  refit_p_normalized.py          — P-experiment re-fit script
+  refit_n_normalized.py          — N-experiment re-fit script
+  refit_ipd_normalized.py        — IPD re-fit script
+  ipd_transfer_test_v4.py        — V4 normalized transfer test
+  phenotype_geometry.py          — Cross-library geometry analysis
+
+  (Legacy v3 libraries preserved for comparison:
+   v3_library_fitted.json, n_library_fitted.json, ipd_library_fitted.json)
