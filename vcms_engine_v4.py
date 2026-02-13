@@ -16,10 +16,13 @@ Changes from v3:
      (Book 1 Ch 2 — repeated exposure reduces strain impact)
   6. Horizon scaling: h_start proportional to game length, not absolute round
   7. Ensemble elimination parameters in GameConfig for game-adapted selection
+  8. Normalized game time: temporal rate parameters operate in [0,1] game
+     progress rather than raw rounds. dt = 1/(n_rounds-1) per step.
+     Subsumes horizon_scaling and strain_decay for cross-game transfer.
 
 Backward compatibility:
   s_exploitation_rate=0, v_self_weight=0, PGG_P_CONFIG → identical to v3
-  strain_decay=0, horizon_scaling=False → identical to v4.0
+  strain_decay=0, horizon_scaling=False, normalized_time=False → identical to v4.0
 
 New parameters (20 total = 18 from v3 + 2 new):
   v_self_weight:       Self-state visibility (0=oblivious, 1=fully aware) [0,1]
@@ -31,6 +34,7 @@ Game-specific (adapter, via GameConfig):
   n_signals:            Number of independent information channels
   strain_decay:         Per-round strain decay rate (habituation)
   horizon_scaling:      Scale h_start proportionally to game length
+  normalized_time:      Temporal rates in [0,1] game progress (subsumes above two)
   elim_floor/elim_mult: Ensemble elimination tuning for action space
 """
 
@@ -78,6 +82,7 @@ class GameConfig:
     strain_decay: float = 0.0           # Per-round strain decay (0 = no decay, habituation)
     horizon_scaling: bool = False        # Scale h_start proportionally to game length?
     reference_rounds: int = 10           # Reference game length for horizon scaling
+    normalized_time: bool = False        # Temporal rates in normalized game progress [0,1]?
     elim_floor: float = 0.5             # Ensemble elimination distance floor
     elim_mult: float = 3.0              # Ensemble elimination distance multiplier
 
@@ -192,6 +197,18 @@ PARAM_BOUNDS = {
     's_exploitation_rate': (0.0, 2.0),
 }
 
+# Bounds for normalized-time fitting.
+# Rate parameters scale by (n_rounds-1) so bounds widen proportionally.
+# h_start is now in [0,1] game progress instead of [0,9] rounds.
+PARAM_BOUNDS_NORMALIZED = {
+    **PARAM_BOUNDS,
+    's_rate':              (0.0, 18.0),    # 2.0 * 9 (10-round equivalent)
+    'b_depletion_rate':    (0.0, 18.0),    # 2.0 * 9
+    'b_replenish_rate':    (0.0, 18.0),    # 2.0 * 9
+    'facilitation_rate':   (0.0, 9.0),     # 1.0 * 9
+    'h_start':             (0.0, 1.0),     # fractional game progress
+}
+
 
 # =============================================================================
 # Helpers
@@ -284,6 +301,7 @@ def run_vcms_v4(params: VCMSParams, rounds, game_config: GameConfig,
     p = params
     gc = game_config
     force_no_routing = (knockout == 'no_routing')
+    n_rounds = len(rounds)
 
     # Snap s_dir to ±1
     s_dir = 1.0 if p.s_dir >= 0 else -1.0
@@ -291,9 +309,21 @@ def run_vcms_v4(params: VCMSParams, rounds, game_config: GameConfig,
     # Compute effective alpha (bandwidth scaling)
     effective_alpha = _bandwidth_scale(p.alpha, gc)
 
-    # Compute effective h_start (horizon scaling for longer games)
-    if gc.horizon_scaling and gc.reference_rounds > 0:
-        effective_h_start = p.h_start * (len(rounds) / gc.reference_rounds)
+    # ---- Normalized game time ----
+    # When enabled, temporal rate parameters operate in [0,1] game progress.
+    # dt = 1/(n_rounds-1) per step. Rates mean "per unit of game progress"
+    # rather than "per round", making them transfer across game lengths.
+    if gc.normalized_time and n_rounds > 1:
+        dt = 1.0 / (n_rounds - 1)
+    else:
+        dt = 1.0  # Legacy: rates are per-round
+
+    # Compute effective h_start
+    if gc.normalized_time:
+        # h_start is in [0,1] game progress — convert to round index
+        effective_h_start = p.h_start * (n_rounds - 1)
+    elif gc.horizon_scaling and gc.reference_rounds > 0:
+        effective_h_start = p.h_start * (n_rounds / gc.reference_rounds)
     else:
         effective_h_start = p.h_start
 
@@ -370,10 +400,12 @@ def run_vcms_v4(params: VCMSParams, rounds, game_config: GameConfig,
         else:
             s_exploitation = 0.0
 
-        # Total strain accumulation
-        strain += p.s_rate * (gap_strain + pun_strain) + s_exploitation
+        # Total strain accumulation (dt-scaled)
+        strain += dt * p.s_rate * (gap_strain + pun_strain) + dt * s_exploitation
 
         # Strain decay (habituation — prevents runaway in long games)
+        # Note: with normalized_time, strain rates are already temporally scaled,
+        # so strain_decay is typically unnecessary. Kept for backward compat.
         if gc.strain_decay > 0:
             strain *= (1.0 - gc.strain_decay)
 
@@ -396,16 +428,16 @@ def run_vcms_v4(params: VCMSParams, rounds, game_config: GameConfig,
 
         if experience < 0:
             magnitude = abs(experience)
-            depletion = p.b_depletion_rate * magnitude
+            depletion = dt * p.b_depletion_rate * magnitude
             if magnitude > p.acute_threshold:
                 depletion *= ACUTE_MULT
             B -= depletion
         elif experience > 0:
             pun_gate = max(0.0, 1.0 - pun_recv_prev / gc.max_punish)
-            B += p.b_replenish_rate * experience * pun_gate
+            B += dt * p.b_replenish_rate * experience * pun_gate
 
         if i > 0:
-            B -= p.b_depletion_rate * (pun_recv_prev / 15.0)
+            B -= dt * p.b_depletion_rate * (pun_recv_prev / 15.0)
 
         B = max(0.0, B)
 
@@ -417,7 +449,7 @@ def run_vcms_v4(params: VCMSParams, rounds, game_config: GameConfig,
         # STEP 4: M_EVAL — FACILITATION / INHIBITION
         # =============================================================
         if i > 0:
-            m_eval += p.facilitation_rate * experience
+            m_eval += dt * p.facilitation_rate * experience
 
         rt['m_eval'] = {'m_eval_acc': m_eval}
 
