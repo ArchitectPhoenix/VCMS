@@ -85,6 +85,13 @@ PGG_N_BW_CONFIG = GameConfig(
     n_signals=2, use_bandwidth_scaling=True, reference_signals=4,
 )
 
+IPD_CONFIG = GameConfig(
+    max_contrib=1,    # binary: 1=cooperate, 0=defect
+    max_punish=1,     # no punishment in standard IPD (placeholder for RMSE normalization)
+    has_punishment=False,
+    n_signals=2,      # own action, partner's action
+)
+
 
 # =============================================================================
 # Agent Parameters
