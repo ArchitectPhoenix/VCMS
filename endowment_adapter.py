@@ -51,8 +51,11 @@ ITEM_VALUES = {"mug": 3.86, "amazon": 78.38, "spotify": 12.24}
 DURATION_MULT = {"now": 1.0, "day": 2.0, "week": 3.5, "month": 5.0}
 
 # Facilitation multipliers (M_eval competes with integration over time)
-# Zero at "now" (no adaptation yet), grows with exposure duration
-FACILITATION_MULT = {"now": 0.0, "day": 1.5, "week": 4.0, "month": 8.0}
+# Zero at "now" (no experience-based adaptation at instant of endowment).
+# Very gentle sublinear growth: fac/dur ratio stays below 0.15,
+# ensuring effective integration is strictly monotonic with duration.
+# Fac/dur ratios: 0.00, 0.075, 0.114, 0.140.
+FACILITATION_MULT = {"now": 0.0, "day": 0.15, "week": 0.40, "month": 0.70}
 
 # Scaling constants
 BUYER_COST_SCALE = 0.15       # buyer discount from (1 - c_base)
