@@ -15,6 +15,15 @@ Phase 1: Transfer Test
   - 8,640 total valuations (576 × 3 × 5)
   - 6 predictions (PT1-PT6) evaluated against CFV benchmarks
 
+Adapter architecture:
+  - V-channel → Reference integration via run_vcms_v4_passive (alpha, v_rep)
+  - v_ref → Controls how deeply item shifts reference point
+  - C-channel → Topology change cost ((1 - c_base) × integration × value)
+  - M-channel → Facilitation reduces change cost over time (not V signal)
+  - S-channel → Strain premium from anticipated loss
+  - B-channel → Affordability gate (B / (B + strain + eps))
+  - Inertia → Possession attachment (amplifies seller premium)
+
 All adapter constants are fixed a priori — no fitting, no free parameters
 beyond the already-fitted VCMS cooperation parameters.
 
@@ -32,6 +41,7 @@ from federation_sim import (
     AgentParams,
 )
 from phenotype_geometry import unified_label
+from vcms_engine_v4 import run_vcms_v4_passive, EPS
 
 
 # ================================================================
@@ -46,16 +56,11 @@ ITEM_SALIENCE = {"mug": 0.8, "amazon": 0.4, "spotify": 0.6}
 # Item value anchors (from CFV buyer WTP means, in dollars)
 ITEM_VALUES = {"mug": 3.86, "amazon": 78.38, "spotify": 12.24}
 
-# Seller possession-duration multipliers (V-channel integration timescale)
-# Longer possession → deeper integration into reference topology
-DURATION_MULT = {"now": 1.0, "day": 2.0, "week": 3.5, "month": 5.0}
-
-# Facilitation multipliers (M_eval competes with integration over time)
-# Zero at "now" (no experience-based adaptation at instant of endowment).
-# Very gentle sublinear growth: fac/dur ratio stays below 0.15,
-# ensuring effective integration is strictly monotonic with duration.
-# Fac/dur ratios: 0.00, 0.075, 0.114, 0.140.
-FACILITATION_MULT = {"now": 0.0, "day": 0.15, "week": 0.40, "month": 0.70}
+# Passive dynamics: number of integration steps per condition.
+# More steps = longer possession = deeper V integration + more facilitation.
+# dt=0.05 per step. Total normalized time: now=0.05, day=0.20, week=0.60, month=1.50.
+PASSIVE_STEPS = {"now": 1, "day": 4, "week": 12, "month": 30}
+PASSIVE_DT = 0.05
 
 # Scaling constants
 BUYER_COST_SCALE = 0.15       # buyer discount from (1 - c_base)
@@ -80,54 +85,72 @@ def compute_valuation(params, item_type, condition):
     """
     Map VCMS cooperation parameters to endowment effect valuation.
 
+    Uses run_vcms_v4_passive to evolve V/M/B state during passive possession,
+    then computes WTA from the evolved state. Channel mapping matches the
+    engine's actual architecture:
+
+        V → Reference integration (passive dynamics via alpha, v_rep)
+        v_ref → Depth of reference shift (external vs self-anchored)
+        C → Topology change cost, reduced by facilitation (M_eval)
+        S → Strain premium from anticipated loss
+        B → Affordability gate (suppresses premium when B low vs strain)
+        Inertia → Possession attachment (amplifies seller premium)
+
     Args:
         params: AgentParams with alpha, c_base, inertia, s_initial,
-                s_rate, facilitation_rate
+                s_rate, facilitation_rate, v_ref, v_rep, b_initial,
+                b_replenish_rate
         item_type: "mug", "amazon", or "spotify"
         condition: "buyer", "now", "day", "week", or "month"
 
     Returns:
         Valuation in dollars (WTP for buyers, WTA for sellers).
-
-    Channel mapping:
-        V → Reference integration (alpha × salience × duration)
-        C → Topology change cost ((1 - c_base) × integration × value)
-        M → Facilitation (facilitation_rate competes with integration)
-        S → Strain premium (s_rate × integration × (1 + s_initial/5))
-        Inertia → Possession attachment (amplifies seller premium)
     """
     item_value = ITEM_VALUES[item_type]
-    item_salience = ITEM_SALIENCE[item_type]
+    item_signal = ITEM_SALIENCE[item_type]
 
     if condition == "buyer":
         # Buyer: WTP = value minus discounts from topology change resistance
+        # Buyer doesn't possess the item, so no integration/facilitation/gate
         buyer_discount = (1.0 - params.c_base) * BUYER_COST_SCALE * item_value
         inertia_discount = item_value * params.inertia * BUYER_INERTIA_SCALE
         wtp = item_value - buyer_discount - inertia_discount
         return max(0.0, wtp)
 
-    # Seller: WTA = value plus premium from integration/strain/inertia
-    duration_mult = DURATION_MULT[condition]
-    fac_mult = FACILITATION_MULT[condition]
+    # ── Seller: run passive dynamics for this possession duration ──
 
-    # V-channel: reference integration depth
-    V_integration = params.alpha * item_salience * duration_mult
+    n_steps = PASSIVE_STEPS[condition]
+    state = run_vcms_v4_passive(params, n_steps, item_signal, dt=PASSIVE_DT)
 
-    # M-channel: facilitation competes with integration
-    facilitation = params.facilitation_rate * fac_mult
-    effective_integration = max(0.0, V_integration - facilitation)
+    # Integration depth: how much the reference shifted, gated by v_ref.
+    # v_ref=1 → fully environment-tracking (item fully shifts reference)
+    # v_ref=0 → fully self-anchored (item doesn't shift reference → no EE)
+    integration = params.v_ref * state['v_level']
 
-    # C-channel: topology change cost
-    change_cost = (1.0 - params.c_base) * effective_integration * item_value
+    # C-channel: topology change cost, reduced by facilitation.
+    # Facilitation (m_eval) reduces the effective cost of the transaction,
+    # matching the engine's Step 6: c_target_adj = c_target + m_eval.
+    raw_change_cost = (1.0 - params.c_base) * integration * item_value
+    facilitation_reduction = state['m_eval'] * item_value
+    change_cost = max(0.0, raw_change_cost - facilitation_reduction)
 
     # S-channel: strain premium from anticipated loss
-    strain_premium = (params.s_rate * effective_integration
+    strain_premium = (params.s_rate * integration
                       * (1.0 + params.s_initial / STRAIN_S_INITIAL_SCALE))
 
     # Inertia: amplifies the total premium for sellers
     inertia_amp = 1.0 + params.inertia * SELLER_INERTIA_AMP
 
-    wta = item_value + (change_cost + strain_premium) * inertia_amp
+    # Raw premium before affordability gate
+    raw_premium = (change_cost + strain_premium) * inertia_amp
+
+    # B-channel: affordability gate.
+    # Matches engine Step 5: affordability = B / (B + remaining_strain + EPS).
+    # Agents with low B relative to anticipated strain can't sustain the
+    # loss-averse stance and accept prices closer to market value.
+    affordability = state['B'] / (state['B'] + strain_premium + EPS)
+
+    wta = item_value + raw_premium * affordability
     return wta
 
 
@@ -334,23 +357,15 @@ def compute_aggregate_metrics(results):
             "frac_gt_3.0": np.mean(ratios_arr > 3.0),
         }
 
-    # --- Parameter sensitivity (correlation with mug WTA/WTP) ---
-    param_names = ["alpha", "c_base", "inertia", "s_initial",
-                   "s_rate", "facilitation_rate"]
-    mug_ratios = np.array([r["wta_wtp"]["mug"] for r in results.values()])
-    agents_list = list(results.values())
-    # Need params; reconstruct from results ordering
-    # Actually we need the agents list — pass it separately or embed
-    # For now, store raw ratios for later correlation
-    metrics["mug_ratios"] = mug_ratios
+    metrics["mug_ratios"] = np.array(mug_ratios)
 
     return metrics
 
 
 def compute_parameter_correlations(agents, results):
     """Compute correlation of each VCMS parameter with WTA/WTP ratios."""
-    param_names = ["alpha", "c_base", "inertia", "s_initial",
-                   "s_rate", "facilitation_rate"]
+    param_names = ["alpha", "c_base", "v_ref", "inertia", "s_initial",
+                   "s_rate", "facilitation_rate", "b_initial"]
     correlations = {}
 
     for item in ITEM_TYPES:
@@ -499,6 +514,7 @@ def print_header(agents, pool_map):
     print("=" * 78)
     print("  VCMS ENDOWMENT EFFECT ADAPTER — PHASE 1: TRANSFER TEST")
     print("  576 cooperation-fitted agents → endowment valuations (zero retuning)")
+    print("  Using run_vcms_v4_passive for dynamic integration + affordability gate")
     print("=" * 78)
 
     # Agent counts
@@ -532,6 +548,9 @@ def print_header(agents, pool_map):
           f"Amazon (${ITEM_VALUES['amazon']:.2f}), "
           f"Spotify (${ITEM_VALUES['spotify']:.2f})")
     print(f"  Conditions: buyer, seller-now, seller-day, seller-week, seller-month")
+    print(f"  Passive steps: now={PASSIVE_STEPS['now']}, day={PASSIVE_STEPS['day']}, "
+          f"week={PASSIVE_STEPS['week']}, month={PASSIVE_STEPS['month']} "
+          f"(dt={PASSIVE_DT})")
 
 
 def print_main_table(metrics):
@@ -678,8 +697,8 @@ def print_parameter_sensitivity(correlations):
     print(f"  PARAMETER SENSITIVITY (correlation with WTA/WTP ratio)")
     print(f"{'=' * 78}")
 
-    param_names = ["alpha", "c_base", "inertia", "s_initial",
-                   "s_rate", "facilitation_rate"]
+    param_names = ["alpha", "c_base", "v_ref", "inertia", "s_initial",
+                   "s_rate", "facilitation_rate", "b_initial"]
 
     print(f"\n  {'Parameter':<20s}", end="")
     for item in ITEM_TYPES:
@@ -691,10 +710,12 @@ def print_parameter_sensitivity(correlations):
     channel_map = {
         "alpha": "V (Visibility)",
         "c_base": "C (Cost)",
+        "v_ref": "V (Reference)",
         "inertia": "M (Memory)",
         "s_initial": "S (Strain)",
         "s_rate": "S (Strain)",
         "facilitation_rate": "M (Facilit.)",
+        "b_initial": "B (Budget)",
     }
 
     for p in param_names:
@@ -721,7 +742,6 @@ def print_predictions(predictions):
     print(f"\n  {n_supported}/{len(predictions)} predictions supported\n")
 
     for p in predictions:
-        status = "SUPPORTED" if p["supported"] else "NOT SUPPORTED"
         marker = "+" if p["supported"] else "-"
         print(f"  [{marker}] {p['id']}: {p['description']}")
         print(f"      Actual: {p['actual']}")
