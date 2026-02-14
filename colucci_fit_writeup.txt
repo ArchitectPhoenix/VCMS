@@ -1,0 +1,596 @@
+VCMS Behavioral Economics Adapter: Colucci Dataset Fitting and Cross-Domain Verification
+=========================================================================================
+
+1. OVERVIEW
+-----------
+
+This document describes the methodology and results of fitting VCMS
+(Visibility-Cost-Memory-Strain) cooperation parameters to the Colucci,
+Franco & Valori (2023) endowment effect dataset, then running those
+fitted parameters through PGG and IPD cooperation game engines to verify
+that the resulting behavioral phenotype distributions are consistent with
+existing cooperation-game-fitted libraries.
+
+The pipeline consists of three stages:
+
+  Stage 1: Engine Extension
+    Added run_vcms_v4_passive() to the VCMS v4 engine — a passive
+    dynamics mode that evolves V/M/B state without game interaction.
+    Validated backward-compatible: 1,960 round-predictions across 196
+    PGG subjects remain identical.
+
+  Stage 2: Endowment Adapter
+    Maps VCMS cooperation parameters to WTA/WTP valuations via channel-
+    consistent mappings. Uses run_vcms_v4_passive for seller temporal
+    integration. Six a priori adapter constants, zero fitted parameters
+    beyond the per-subject VCMS parameters themselves.
+
+  Stage 3: Colucci Fitting and Cross-Domain Verification
+    Fits 511 subjects from the CFV dataset via differential evolution
+    through the endowment adapter, then runs fitted parameters through
+    PGG and IPD engines for phenotype comparison.
+
+
+2. DATA SOURCE
+--------------
+
+Dataset: Colucci, Franco & Valori (2023)
+  "The temporal endowment effect: An experimental study"
+
+Design: Between-subjects, 5 conditions × 3 items
+  Conditions: buyer, seller-now, seller-day, seller-week, seller-month
+  Items: coffee mug ($3.86), Amazon gift card ($78.38), Spotify subscription ($12.24)
+  Item values are the mean buyer WTP from the dataset.
+
+Subjects: 516 total in CSV
+  511 after exclusions (4 "DATA EXPIRED", 1 duplicate/invalid)
+    buyer: 99 subjects
+    now:   110 subjects
+    day:   103 subjects
+    week:  99 subjects
+    month: 100 subjects
+
+Each subject provides 3 observations: one valuation per item in their
+assigned condition. Buyer subjects provide WTP; seller subjects provide
+WTA. The unified column Mug_assess / Amazon_assess / Spotify_assess is
+used as the target.
+
+
+3. ENGINE EXTENSION: run_vcms_v4_passive()
+------------------------------------------
+
+Added to vcms_engine_v4.py after run_vcms_v4 (line 580+). Purely
+additive — no modifications to existing functions.
+
+Purpose: Model passive item possession without game interaction. The
+existing engine requires round-by-round observables (others' contributions,
+punishment). In an endowment scenario, the subject passively holds an
+item with no game structure. The passive dynamics module evolves three
+VCMS channels on a passive timescale:
+
+  V-channel:
+    v_group = min(1.0, v_rep × item_signal)
+    v_level(t+1) = alpha × v_group + (1-alpha) × v_level(t)
+    v_level(0) = 0 (pre-item baseline)
+    After n steps: v_level ≈ v_group × (1 - (1-alpha)^n)
+
+  M-channel:
+    m_eval(t+1) = m_eval(t) + dt × facilitation_rate × item_signal
+    m_eval(0) = 0
+
+  B-channel:
+    B(t+1) = B(t) + dt × b_replenish_rate × item_signal
+    B(0) = b_initial
+
+No strain accumulation during passive possession. Strain is computed
+at valuation time from the anticipated topology change of losing the item.
+
+Parameters used: alpha, v_rep, facilitation_rate, b_initial, b_replenish_rate
+Step sizes: dt = 0.05 per step
+Condition mapping: now=1 step, day=4 steps, week=12 steps, month=30 steps
+
+Backward compatibility verified:
+  PGG: 1,960 round-predictions across 196 subjects — all identical
+  IPD: engine path functional with IPD config — 10/10 subjects verified
+
+
+4. ENDOWMENT ADAPTER: compute_valuation()
+------------------------------------------
+
+The adapter maps VCMS parameters to dollar valuations. Each VCMS channel
+maps to a specific economic mechanism:
+
+  4.1 Buyer path (condition = "buyer"):
+
+    WTP = item_value × (1 - (1-c_base) × 0.15 - inertia × 0.1)
+
+    Only c_base and inertia affect buyer valuation. The three item
+    valuations are proportional to item_value, providing effectively
+    one degree of freedom (the multiplier k = 1 - 0.15 + 0.15×c_base
+    - 0.1×inertia). With 2 free parameters and 1 effective constraint,
+    regularization breaks the degeneracy.
+
+  4.2 Seller path (condition = now/day/week/month):
+
+    Step 1 — Passive dynamics:
+      state = run_vcms_v4_passive(params, n_steps, item_signal, dt=0.05)
+      Returns {v_level, m_eval, B} after temporal integration.
+
+    Step 2 — Reference integration depth:
+      integration = v_ref × state.v_level
+      v_ref=1 → environment-tracking (strong endowment effect)
+      v_ref=0 → self-anchored (no endowment effect)
+
+    Step 3 — C-channel (topology change cost):
+      raw_change_cost = (1 - c_base) × integration × item_value
+      facilitation_reduction = state.m_eval × item_value
+      change_cost = max(0, raw_change_cost - facilitation_reduction)
+
+      Facilitation reduces cost, matching engine Step 6 where
+      c_target_adj = c_target + m_eval.
+
+    Step 4 — S-channel (strain premium):
+      strain_premium = s_rate × integration × (1 + s_initial / 5.0)
+
+    Step 5 — Inertia amplification:
+      inertia_amp = 1 + inertia × 0.5
+      raw_premium = (change_cost + strain_premium) × inertia_amp
+
+    Step 6 — B-channel (affordability gate):
+      affordability = B / (B + strain_premium + eps)
+      Matches engine Step 5: agents with low B relative to strain
+      cannot sustain loss-averse pricing.
+
+    Step 7 — Final WTA:
+      WTA = item_value + raw_premium × affordability
+
+  4.3 Fixed adapter constants (set a priori, not fitted):
+
+    ITEM_SALIENCE:       mug=0.8, amazon=0.4, spotify=0.6
+    ITEM_VALUES:         mug=$3.86, amazon=$78.38, spotify=$12.24
+    PASSIVE_STEPS:       now=1, day=4, week=12, month=30
+    PASSIVE_DT:          0.05
+    BUYER_COST_SCALE:    0.15
+    BUYER_INERTIA_SCALE: 0.1
+    SELLER_INERTIA_AMP:  0.5
+    STRAIN_S_INITIAL_SCALE: 5.0
+
+  4.4 Cross-item discrimination:
+
+    Different item_signal values (0.4, 0.6, 0.8) create differential
+    sensitivity through the passive dynamics. High item_signal produces:
+    - Faster v_level convergence
+    - More facilitation accumulation
+    - More budget replenishment
+    This means the cross-item valuation pattern (not just magnitude)
+    constrains the parameter fit beyond the 1-DOF case.
+
+
+5. FITTING METHODOLOGY
+----------------------
+
+  5.1 Free parameters
+
+    Seller subjects (412 total): 10 free parameters
+      alpha           ∈ (0.01, 0.99)   V-integration rate
+      v_rep           ∈ (0.5, 2.0)     Perceptual scaling
+      v_ref           ∈ (0.0, 1.0)     Reference blend
+      c_base          ∈ (0.0, 1.0)     Base cooperation propensity
+      inertia         ∈ (-0.3, 0.95)   Behavioral persistence
+      s_rate          ∈ (0.0, 2.0)     Strain accumulation rate
+      s_initial       ∈ (0.0, 10.0)    Pre-loaded strain
+      facilitation_rate ∈ (0.0, 1.0)   Cost reduction rate
+      b_initial       ∈ (0.1, 5.0)     Starting budget
+      b_replenish_rate ∈ (0.0, 2.0)    Budget recovery rate
+
+    Buyer subjects (99 total): 2 free parameters
+      c_base          ∈ (0.0, 1.0)
+      inertia         ∈ (-0.3, 0.95)
+
+  5.2 Fixed parameters (at P-experiment library medians)
+
+    For buyer subjects, the 8 adapter-relevant parameters not fitted
+    (alpha, v_rep, v_ref, s_rate, s_initial, facilitation_rate,
+    b_initial, b_replenish_rate) are fixed at library medians.
+
+    For all subjects, the 5 non-adapter parameters needed for PGG/IPD
+    simulation are fixed:
+      s_dir = +1.0        (prosocial direction — see §7.3 for discussion)
+      b_depletion_rate = 0.608
+      acute_threshold  = 0.539
+      h_strength       = 0.016
+      h_start          = 5.238
+
+    For PGG/IPD engine runs, the VCMSParams-only fields are fixed:
+      s_frac = 0.677, s_thresh = 1.800, p_scale = 5.830
+      v_self_weight = 0.0, s_exploitation_rate = 0.0
+
+  5.3 Degrees of freedom
+
+    Each subject provides 3 observations (one per item) in a single
+    condition. For sellers with 10 free parameters, the system is
+    heavily underdetermined (10 DOF, 3 observations). For buyers,
+    2 free parameters with effectively 1 independent constraint.
+
+    Regularization is used to provide the missing degrees of freedom.
+
+  5.4 Objective function
+
+    objective(x) = data_term + λ × reg_term
+
+    data_term = sqrt(mean_i((predicted_i - actual_i)² / item_value_i²))
+      Relative RMSE: normalizes across the $3.86 to $78.38 value range.
+
+    reg_term = sqrt(mean_j(((x_j - median_j) / std_j)²))
+      L2 penalty toward library medians, normalized by library standard
+      deviations. Prevents overfitting by anchoring parameters near
+      the known cooperation-game distribution.
+
+    λ = 0.05 (moderate regularization — data term dominates but
+    wild parameter values are penalized)
+
+  5.5 Optimizer
+
+    scipy.optimize.differential_evolution
+      maxiter:  300
+      popsize:  15
+      tol:      1e-6
+      seed:     42 + subject_index (reproducible but varied)
+      polish:   True (Nelder-Mead refinement after DE)
+
+    ~3,000-5,000 function evaluations per subject.
+    Total fitting time: ~600 seconds for 511 subjects.
+
+  5.6 Methodological limitations
+
+    a) Underdetermination: 10 free parameters, 3 observations. The
+       optimizer finds ONE solution in the feasible region; many others
+       exist. Regularization biases the solution toward the library
+       center, which is a strong assumption.
+
+    b) Buyer degeneracy: buyer WTP is proportional to item_value for
+       any (c_base, inertia) pair, so the 3 buyer observations provide
+       only 1 effective constraint. Regularization selects the point
+       on the constraint line closest to library medians.
+
+    c) No cross-condition information: each subject is in only one
+       condition. A within-subjects design would provide 15 observations
+       per subject (3 items × 5 conditions) and substantially better
+       identifiability.
+
+    d) s_dir unobservable: the strain direction parameter (prosocial
+       vs antisocial) does not affect endowment valuations but is
+       critical for PGG/IPD phenotype. Fixed at +1 for all subjects.
+       See §7.3 for implications.
+
+
+6. FITTING RESULTS
+------------------
+
+  6.1 Fit quality (relative RMSE, including regularization penalty)
+
+    Condition    N    RMSE mean   RMSE median
+    buyer       99    0.6334      0.5551
+    now        110    0.5671      0.5362
+    day        103    0.5587      0.5037
+    week        99    0.5252      0.4587
+    month      100    0.5415      0.4901
+    ALL        511    0.5651      0.5167
+
+    Buyers have the highest RMSE because the proportional model cannot
+    capture cross-item preference heterogeneity. Seller fits improve
+    with longer possession durations because more passive integration
+    steps create more discriminating cross-item patterns.
+
+  6.2 Valuation accuracy (MAE by item and condition)
+
+    Cond/Item    MAE($)  Actual mean  Predicted mean
+    buyer/mug     2.68     $3.88         $3.61
+    buyer/amzn   19.51    $78.10        $73.23
+    buyer/spot    7.03    $12.21        $11.44
+    now/mug       2.31     $6.42         $6.52
+    now/amzn     18.85    $88.85        $96.12
+    now/spot      6.15    $16.56        $17.13
+    day/mug       2.21     $7.50         $7.10
+    day/amzn     17.36    $92.18        $99.36
+    day/spot      6.05    $17.15        $18.06
+    week/mug      2.23     $6.48         $6.58
+    week/amzn    17.13    $93.13       $100.06
+    week/spot     4.95    $19.26        $17.98
+    month/mug     2.11     $7.58         $7.24
+    month/amzn   17.85    $92.14        $99.77
+    month/spot    5.61    $17.23        $18.40
+
+    Mug and Spotify fits are reasonably accurate ($2-6 MAE on $4-19
+    range). Amazon fits are poor ($17-20 MAE on $78-100 range) because
+    the observed WTA distribution is heavily right-censored at $100
+    (the gift card face value), creating a ceiling the adapter model
+    cannot replicate without a boundary mechanism.
+
+  6.3 Fitted parameter distributions (sellers, n=412)
+
+    Parameter           Mean    Median   Std     Library median
+    alpha               0.593   0.487    0.173   0.483
+    v_rep               1.465   1.329    0.215   1.311
+    v_ref               0.864   1.000    0.194   0.557   ***
+    c_base              0.450   0.462    0.339   0.769   ***
+    inertia             0.548   0.575    0.370   0.075   ***
+    s_rate              0.953   0.663    0.937   0.661
+    s_initial           3.549   0.245    4.176   0.229
+    facilitation_rate   0.377   0.389    0.254   0.389
+    b_initial           4.274   3.719    0.642   3.661
+    b_replenish_rate    1.557   1.370    0.263   1.365
+
+    Three parameters show large shifts from library medians (marked ***):
+
+    v_ref (0.864 → 1.000 vs library 0.557):
+      Endowment effect requires strong environment-tracking reference
+      formation — items must deeply shift the reference point to
+      produce meaningful WTA premiums. In cooperation games, moderate
+      v_ref allows agents to maintain disposition-based cooperation
+      even in low-cooperation groups.
+
+    inertia (0.548 → 0.575 vs library 0.075):
+      Possession attachment amplifies seller premium through the
+      inertia_amp = 1 + inertia × 0.5 term. In cooperation games,
+      inertia represents behavioral persistence (striation), which
+      is typically low for evaluative cooperators.
+
+    c_base (0.450 → 0.462 vs library 0.769):
+      Lower c_base produces higher topology change costs ((1-c_base)
+      scales the cost term). Agents who strongly resist behavioral
+      change (low c_base in cooperation) also demand higher premiums
+      for giving up possessions.
+
+  6.4 Fitted parameter distributions (buyers, n=99)
+
+    Parameter    Mean    Median   Library median
+    c_base       0.675   0.769    0.769
+    inertia      0.170   0.075    0.075
+
+    Buyer parameters stay closer to library medians because only 2
+    parameters are fitted with strong regularization.
+
+
+7. CROSS-DOMAIN VERIFICATION: PGG AND IPD
+------------------------------------------
+
+  7.1 Methodology
+
+    PGG simulation:
+      Each fitted subject is run through a 10-round standardized PGG
+      environment with moderate group cooperation (others_mean = 10/20).
+      Autonomous two-pass method: Pass 1 uses c_base × max_contrib as
+      teacher-forced contribution; Pass 2 uses Pass 1 predictions as
+      teacher-forced values. This produces self-consistent internal
+      state evolution without real behavioral data.
+
+    IPD simulation:
+      Each fitted subject is run through a 50-round IPD with a random
+      partner (50% cooperation rate, fixed seed). Same two-pass
+      autonomous method.
+
+    Reference comparison:
+      The same simulation is run on the P-experiment fitted library
+      (196 subjects, for PGG) and IPD fitted library (188 subjects,
+      for IPD) to produce directly comparable reference distributions.
+
+    Phenotype classification:
+      PGG cooperation level: high (>60% of max), mid (30-60%), low (<30%)
+      PGG phenotype: CC/EC/CD/DL criteria from build_phenotype_pools()
+      IPD type: mostly-C (>60% coop), mixed (30-60%), mostly-D (<30%)
+
+  7.2 PGG Results
+
+    Cooperation level distribution:
+
+      Level         Endowment-fitted (n=511)  Reference library (n=196)
+      high (>60%)   222 (43.4%)               92 (46.9%)
+      mid (30-60%)  173 (33.9%)               73 (37.2%)
+      low (<30%)    116 (22.7%)               31 (15.8%)
+
+      Mean contribution: 10.0/20 (endowment) vs 11.4/20 (reference)
+
+    The distribution shape is preserved: majority high-cooperators,
+    then mid, then low. The endowment-fitted population has a slightly
+    higher proportion of low-cooperators (22.7% vs 15.8%), consistent
+    with the parameter shift toward lower c_base needed to explain
+    endowment buyer WTP discounts.
+
+    Phenotype classification:
+
+      Phenotype       Endowment-fitted   Reference (label-based)
+      CC                45 (8.8%)         38 (19.4%)
+      EC                48 (9.4%)         27 (13.8%)
+      CD               196 (38.4%)        11 (5.6%)
+      DL                 0 (0.0%)          — (N/A for P-library)
+      high-other       206 (40.3%)       120 (61.2%)
+      low-other         16 (3.1%)          —
+
+    The phenotype criteria are partially mismatched because:
+    - CC requires c_base > 0.65 AND inertia > 0.3 — endowment-fitted
+      subjects have high inertia but many have c_base < 0.65
+    - CD requires c_base < 0.4 — more endowment subjects fall below
+      this threshold than in the cooperation-game library
+    - The reference "other" bucket (61.2%) is large because the
+      phenotype criteria require behavioral labels that simulation-only
+      subjects lack
+
+    The cooperation LEVEL distribution (high/mid/low) is a better
+    comparison metric than the phenotype labels, and that comparison
+    shows good agreement.
+
+    By endowment condition:
+
+      Condition  N     high    mid     low     avg_c
+      buyer      99    77.8%    8.1%   14.1%   12.0
+      now       110    41.8%   41.8%   16.4%   10.7
+      day       103    37.9%   34.0%   28.2%    9.3
+      week       99    32.3%   50.5%   17.2%    9.7
+      month     100    28.0%   34.0%   38.0%    8.0
+
+    Buyers show the highest PGG cooperation (77.8% high) because their
+    8 non-fitted parameters remain at prosocial library medians.
+    Seller subjects show decreasing cooperation with longer possession
+    duration, because fitting higher WTA premiums requires parameter
+    shifts (higher v_ref, inertia, s_rate; lower c_base) that also
+    reduce cooperation propensity. This gradient is a meaningful
+    finding: it suggests endowment effect strength and cooperation
+    propensity are anti-correlated through shared VCMS parameters.
+
+  7.3 IPD Results
+
+    Type distribution:
+
+      Type        Endowment-fitted (n=511)  Reference simulated (n=188)
+      mostly-C    211 (41.3%)                41 (21.8%)
+      mixed         1 (0.2%)                 13 (6.9%)
+      mostly-D    299 (58.5%)               134 (71.3%)
+
+    Mean cooperation rate: 0.392 (endowment) vs 0.246 (reference)
+
+    Both populations show a bimodal pattern with very few "mixed" agents.
+    This contrasts with the IPD library labels (19.1% mostly-C, 46.3%
+    mixed, 34.6% mostly-D), which were derived from fitting to actual
+    IPD game data with responsive partners. The standardized simulation
+    with a fixed 50% random partner does not create the feedback dynamics
+    that produce mixed behavior in real games.
+
+    The endowment-fitted population has MORE mostly-C agents (41.3% vs
+    21.8%). This is partially explained by the s_dir constraint: all
+    endowment-fitted subjects have s_dir = +1 (prosocial), while in
+    the reference library 30.1% have s_dir < 0. In IPD, antisocial
+    strain direction (s_dir = -1) causes strain from the partner
+    cooperating, pushing the agent toward defection. Without this
+    mechanism, more endowment-fitted agents sustain cooperation.
+
+  7.4 Limitations of the cross-domain verification
+
+    a) s_dir constraint: The endowment adapter does not use s_dir
+       (strain direction is irrelevant to WTA/WTP), so it cannot be
+       recovered from endowment data. All subjects are assigned
+       s_dir = +1. In the cooperation-game library, 30.1% of subjects
+       have negative s_dir. This biases the endowment-fitted population
+       toward more prosocial behavior in PGG/IPD.
+
+    b) Fixed non-adapter parameters: Five AgentParams fields
+       (b_depletion_rate, acute_threshold, h_strength, h_start, s_dir)
+       and three VCMSParams fields (s_frac, s_thresh, p_scale) are
+       fixed at library medians for all subjects. This eliminates a
+       significant source of individual variation that exists in the
+       cooperation-game libraries, compressing the phenotype distribution.
+
+    c) Standardized environment: The PGG and IPD simulations use
+       fixed environments (others_mean = 10, random 50% partner).
+       Real cooperation games have responsive partners whose behavior
+       co-evolves with the subject's choices. This particularly
+       affects the IPD "mixed" category, which requires strategic
+       responsiveness to manifest.
+
+    d) Teacher-forcing approximation: The two-pass simulation is an
+       approximation. Full autonomous simulation would require
+       iterative prediction (predict round t → use prediction as
+       actual → predict round t+1), which is O(n²) per subject.
+       The two-pass approximation converges well for PGG (10 rounds,
+       gradual dynamics) but may be less accurate for IPD (50 rounds,
+       binary choices, potential cascading divergence).
+
+    e) Between-subjects design: Each Colucci subject provides data
+       from only ONE condition. Parameter recovery from 3 observations
+       with 10 free parameters is inherently noisy. The regularization
+       anchor to library medians helps but also limits the range of
+       recovered parameter profiles.
+
+
+8. INTERPRETATION AND CONCLUSIONS
+---------------------------------
+
+  8.1 What the results support
+
+    The PGG cooperation level distribution from endowment-fitted
+    subjects (43/34/23% high/mid/low) is broadly consistent with
+    the cooperation-game reference (47/37/16%). The majority of
+    subjects in both populations are high-cooperators, followed by
+    mid, then low. This is notable given that the parameters were
+    fitted to a completely different behavioral domain (endowment
+    valuations) with no cooperation-game data whatsoever.
+
+    The by-condition gradient (buyers most cooperative → month-sellers
+    least) reveals a theoretically meaningful relationship: the VCMS
+    parameters that produce strong endowment effects (high v_ref,
+    high inertia, low c_base) are the same parameters that reduce
+    cooperation in PGG. This is not a trivial finding — it suggests
+    that loss aversion and defection may share a common dispositional
+    substrate within the VCMS framework.
+
+  8.2 What the results do not support
+
+    The detailed phenotype distribution (CC/EC/CD/DL) does not match
+    well between populations. The endowment-fitted population has too
+    many CD-classified agents (38.4% vs 5.6%) and too few CC agents
+    (8.8% vs 19.4%). This reflects the parameter shifts required by
+    the endowment domain — particularly the lower c_base and higher
+    inertia — which push subjects out of CC criteria and into CD criteria.
+
+    The IPD comparison is inconclusive because the standardized
+    simulation environment produces bimodal behavior in both populations,
+    obscuring the mixed category that dominates real IPD data. The
+    s_dir constraint further distorts the endowment-fitted distribution.
+
+  8.3 Open questions for theory evaluation
+
+    a) Is the c_base shift real or artifactual? The endowment adapter's
+       buyer equation ties c_base to WTP discount: lower c_base →
+       higher topology change resistance → lower WTP. If this mapping
+       is correct, then endowment buyers who pay less than face value
+       genuinely have lower cooperation propensity. But if the buyer
+       equation is too simple (it cannot capture cross-item preference
+       heterogeneity), the c_base depression may be a fitting artifact.
+
+    b) Does inertia play the same role across domains? In cooperation
+       games, inertia = behavioral persistence (striation). In the
+       endowment adapter, inertia = possession attachment (amplifier
+       of seller premium). These are conceptually related (resistance
+       to state change) but the quantitative mapping may not be exact.
+
+    c) Should s_dir be recoverable from endowment data? The current
+       adapter treats strain as always positive (strain from
+       anticipated loss). An extended adapter might allow negative
+       strain (eagerness to sell, excitement about the transaction),
+       which would provide s_dir discrimination.
+
+    d) Would a within-subjects design dramatically improve parameter
+       recovery? Each subject seeing all 5 conditions (buyer + 4
+       seller durations) × 3 items = 15 observations would provide
+       much better identifiability for the 10 free parameters.
+
+
+9. FILES MODIFIED/CREATED
+-------------------------
+
+  Modified:
+    vcms_engine_v4.py        Added run_vcms_v4_passive() (56 lines)
+    endowment_adapter.py     Rewritten: passive dynamics, v_ref gate,
+                             facilitation→cost, affordability gate
+
+  Created:
+    colucci_fit.py           Fitting pipeline + PGG/IPD verification
+    v4_colucci_library_fitted.json   511 fitted subject records
+
+  Unchanged:
+    federation_sim.py        Library loading, AgentParams, phenotype pools
+    phenotype_geometry.py    Unified phenotype labels
+    All existing fitted libraries (v3_library_fitted.json,
+      v4_library_fitted.json, v4_n_library_fitted.json,
+      v4_ipd_library_fitted.json)
+
+
+10. REPRODUCIBILITY
+-------------------
+
+  Full pipeline:
+    python3 colucci_fit.py              # ~10 min: fit + simulate
+    python3 colucci_fit.py --sim-only   # ~1 min: simulate only (uses saved library)
+
+  Dependencies: numpy, scipy, pandas (for initial data exploration only)
+  All random seeds are fixed (DE seed = 42 + subject_index; IPD partner seed = 42).
