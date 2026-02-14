@@ -210,12 +210,115 @@ def _apply_boosts(members, dt):
 
 
 # ================================================================
+# VISIBILITY EFFECTS — FULL PARAMETER TRANSPARENCY
+# ================================================================
+
+def _apply_visibility(groups, round_contribs, dt, vis_config):
+    """
+    Apply effects of full parameter/state visibility between all agents in each group.
+
+    All agents see all groupmates' parameters (c_base, s_initial, alpha, inertia,
+    b_depletion_rate, b_replenish_rate) and current state (B, strain). This
+    knowledge is operationalized as three between-round state modifications:
+
+    1. Empathetic strain modulation: knowing WHY someone defects (constraint vs choice)
+       reduces strain from their gap. Gated by observer's alpha (social sensitivity).
+
+    2. Solidarity transfer: agents above group median budget share a fraction with
+       agents below. Sharing rate gated by sharer's c_base (prosocial tendency).
+
+    3. Informed reference: agent's v_level shifts toward mean of capable agents
+       (those with budget above vulnerability threshold), preventing downward spiral
+       from constrained agents dragging the reference down.
+    """
+    empathy = vis_config.get('empathy', False)
+    solidarity = vis_config.get('solidarity', False)
+    reference = vis_config.get('reference', False)
+
+    for gid, members in groups.items():
+        if len(members) <= 1:
+            continue
+
+        budgets = [ag.state.B for ag in members]
+        n = len(members)
+        sorted_b = sorted(budgets)
+        median_b = sorted_b[n // 2]
+        vulnerability_threshold = max(median_b * 0.3, 0.05)
+
+        # --- Empathetic strain modulation ---
+        if empathy:
+            for ag in members:
+                # Count groupmates whose defection is from constraint (low B), not choice
+                constrained_count = 0
+                for m in members:
+                    if m is ag:
+                        continue
+                    if m.state.B < vulnerability_threshold:
+                        constrained_count += 1
+
+                if constrained_count > 0:
+                    # Empathy strength = observer's social sensitivity (alpha)
+                    empathy_strength = ag.params.alpha
+                    constrained_frac = constrained_count / max(n - 1, 1)
+                    # Reduce strain: understanding reduces frustration from structural gaps
+                    # Max 30% reduction when all groupmates are constrained + full alpha
+                    reduction = empathy_strength * constrained_frac * 0.3
+                    ag.state.strain *= (1.0 - reduction)
+
+        # --- Solidarity transfer ---
+        if solidarity:
+            above = [ag for ag in members if ag.state.B > median_b]
+            below = [ag for ag in members if ag.state.B <= median_b and ag.state.B < median_b]
+            if above and below:
+                total_shared = 0.0
+                for ag in above:
+                    # Sharing gated by c_base: prosocial agents share more
+                    # Rate: up to 10% of excess per round, scaled by dt
+                    share_rate = ag.params.c_base * 0.1
+                    excess = ag.state.B - median_b
+                    share = excess * share_rate * dt
+                    if share > 0:
+                        ag.state.B -= share
+                        total_shared += share
+
+                if total_shared > 0:
+                    per_recipient = total_shared / len(below)
+                    for ag in below:
+                        ag.state.B += per_recipient
+
+        # --- Informed reference ---
+        if reference:
+            contribs = round_contribs.get(gid)
+            if contribs is None:
+                continue
+
+            # Identify capable agents (those with budget to cooperate)
+            capable_contribs = []
+            for j, m in enumerate(members):
+                if m.state.B > vulnerability_threshold and j < len(contribs):
+                    capable_contribs.append(contribs[j])
+
+            # Only adjust if some agents are constrained (otherwise no shift needed)
+            if capable_contribs and len(capable_contribs) < n:
+                capable_mean_norm = (sum(capable_contribs) /
+                                     max(len(capable_contribs), 1)) / MAX_CONTRIB
+
+                for ag in members:
+                    # Blend toward capable-only reference
+                    # Strength gated by alpha: socially sensitive agents adjust more
+                    blend = ag.params.alpha * 0.3
+                    ag.state.v_level = ((1.0 - blend) * ag.state.v_level +
+                                        blend * capable_mean_norm)
+
+
+# ================================================================
 # SIMULATE — PHASE 3 EXTENDED LOOP
 # ================================================================
 
-def simulate_phase3(agents, pools, rng, n_rounds=100, mechanisms=None):
+def simulate_phase3(agents, pools, rng, n_rounds=100, mechanisms=None,
+                     visibility=None):
     """
-    Run n_rounds with pluggable mechanisms, including rehabilitation.
+    Run n_rounds with pluggable mechanisms, including rehabilitation and visibility.
 
     Extends Phase 2 simulate() with:
       - 'rehabilitation' mechanism (strain reduction, budget support, replenishment
@@ -223,9 +326,12 @@ def simulate_phase3(agents, pools, rng, n_rounds=100, mechanisms=None):
       - Per-round boost application
       - Intervention cost accounting
       - Hybrid escalation (rehabilitate → remove)
+      - Full visibility effects (empathy, solidarity, informed reference)
 
     mechanisms: list of (name, kwargs). Names:
       'none', 'punishment', 'threshold', 'sustainability', 'rehabilitation'
+    visibility: dict with keys 'empathy', 'solidarity', 'reference' (bool each),
+      or None for no visibility effects.
     """
     groups = assign_groups(agents)
     dt = 1.0 / (n_rounds - 1) if n_rounds > 1 else 1.0
@@ -570,6 +676,10 @@ def simulate_phase3(agents, pools, rng, n_rounds=100, mechanisms=None):
                         'post_strain': target.state.strain,
                         'post_budget': target.state.B,
                     })
+
+        # Apply visibility effects (end of round, after all mechanisms)
+        if visibility:
+            _apply_visibility(groups, round_contribs, dt, visibility)
 
         # Clean up empty groups
         for gid in list(groups.keys()):
@@ -996,8 +1106,385 @@ def print_predictions_scorecard(results):
 
 
 # ================================================================
+# PHASE 3B: FULL VISIBILITY EXTENSION
+# ================================================================
+#
+# All agents see all groupmates' parameters and state. Tests whether
+# visibility can increase navigable agency while maintaining baseline
+# dignity. Varies mechanisms with visibility always ON.
+
+FULL_VIS = {'empathy': True, 'solidarity': True, 'reference': True}
+EMPATHY_ONLY = {'empathy': True, 'solidarity': False, 'reference': False}
+SOLIDARITY_ONLY = {'empathy': False, 'solidarity': True, 'reference': False}
+REFERENCE_ONLY = {'empathy': False, 'solidarity': False, 'reference': True}
+
+VISIBILITY_CONDITIONS = {
+    # --- Controls (no visibility) ---
+    'B1_none':           ([('none', {})],           None),
+    'B2_sustain':        ([('sustainability', {})],  None),
+    'B3_rehab_grad':     ([('rehabilitation', {'mode': 'hybrid_graduated'})], None),
+    # --- Visibility components (no enforcement) ---
+    'V1_empathy':        ([('none', {})],           EMPATHY_ONLY),
+    'V2_solidarity':     ([('none', {})],           SOLIDARITY_ONLY),
+    'V3_reference':      ([('none', {})],           REFERENCE_ONLY),
+    'V4_full_vis':       ([('none', {})],           FULL_VIS),
+    # --- Visibility + enforcement ---
+    'V5_vis+sustain':    ([('sustainability', {})],  FULL_VIS),
+    'V6_vis+rehab_comp': ([('rehabilitation', {'mode': 'comprehensive'})], FULL_VIS),
+    'V7_vis+rehab_tgt':  ([('rehabilitation', {'mode': 'targeted'})],      FULL_VIS),
+    'V8_vis+graduated':  ([('rehabilitation', {'mode': 'hybrid_graduated'})], FULL_VIS),
+}
+
+
+def compute_visibility_metrics(result, n_rounds=100):
+    """Phase 3 metrics plus dignity, agency, and navigability indices."""
+    base = compute_phase3_metrics(result, n_rounds)
+    agents = result['agents']
+
+    active_agents = [ag for ag in agents if ag.active_to == -1]
+
+    # --- Dignity metrics ---
+
+    # Per-phenotype survival rates
+    phenotype_survivals = {}
+    for ptype in ['CC', 'EC', 'CD', 'DL', 'MX']:
+        total = sum(1 for ag in agents if ag.phenotype == ptype)
+        survived = sum(1 for ag in active_agents if ag.phenotype == ptype
+                       and not _is_ruptured(ag))
+        phenotype_survivals[ptype] = survived / max(total, 1)
+
+    # Dignity floor: minimum survival rate across phenotypes with agents present
+    valid_survivals = [v for pt, v in phenotype_survivals.items()
+                       if sum(1 for ag in agents if ag.phenotype == pt) > 0]
+    base['dignity_floor'] = min(valid_survivals) if valid_survivals else 0.0
+
+    # Budget floor: 10th percentile of final budgets
+    final_budgets = []
+    for ag in active_agents:
+        if ag.budget_history:
+            final_budgets.append(ag.budget_history[-1])
+    if final_budgets:
+        sorted_fb = sorted(final_budgets)
+        p10_idx = max(0, len(sorted_fb) // 10)
+        base['budget_floor_p10'] = sorted_fb[p10_idx]
+    else:
+        base['budget_floor_p10'] = 0.0
+
+    # Sustained dignity: fraction of agents maintaining B > 20% of initial throughout
+    sustained_count = 0
+    for ag in active_agents:
+        threshold = ag.params.b_initial * 0.2
+        if ag.budget_history and all(b >= threshold for b in ag.budget_history):
+            sustained_count += 1
+    base['sustained_dignity'] = sustained_count / max(len(active_agents), 1)
+
+    # --- Agency metrics ---
+
+    # Cooperation agency: SD of steady-state cooperation (diversity of choices)
+    final_contribs = []
+    for ag in active_agents:
+        if ag.contrib_history:
+            final_contribs.append(ag.contrib_history[-1])
+    if len(final_contribs) > 1:
+        mean_fc = sum(final_contribs) / len(final_contribs)
+        base['cooperation_agency'] = (
+            sum((c - mean_fc) ** 2 for c in final_contribs) / len(final_contribs)
+        ) ** 0.5
+    else:
+        base['cooperation_agency'] = 0.0
+
+    # Budget-cooperation correlation: do choices lead to outcomes?
+    if len(active_agents) > 3:
+        contribs_for_corr = []
+        budgets_for_corr = []
+        for ag in active_agents:
+            if ag.contrib_history and ag.budget_history:
+                contribs_for_corr.append(sum(ag.contrib_history) / len(ag.contrib_history))
+                budgets_for_corr.append(ag.budget_history[-1])
+        if len(contribs_for_corr) > 3:
+            base['budget_coop_corr'] = _pearson(contribs_for_corr, budgets_for_corr)
+        else:
+            base['budget_coop_corr'] = 0.0
+    else:
+        base['budget_coop_corr'] = 0.0
+
+    # --- Navigability index ---
+    # Combines dignity (everyone survives) and agency (choices matter)
+    # navigability = dignity_floor * (1 - gini) * (1 + normalized_agency)
+    gini_val = base.get('gini', 0.5)
+    agency_norm = base['cooperation_agency'] / max(MAX_CONTRIB, 1)
+    base['navigability'] = base['dignity_floor'] * (1.0 - gini_val) * (1.0 + agency_norm)
+
+    return base
+
+
+def run_visibility_test(n_runs=N_RUNS, n_rounds=100, seed=45):
+    """Run all visibility conditions."""
+    print("\n" + "=" * 120)
+    print("PHASE 3B: FULL VISIBILITY — NAVIGABLE AGENCY AND BASELINE DIGNITY")
+    print("=" * 120)
+
+    print("\nLoading libraries and building pools...")
+    libs = load_libraries()
+    pools = build_enforcement_pools(libs)
+    for name, pool in pools.items():
+        print(f"  {name}: {len(pool)} subjects")
+
+    rng = np.random.default_rng(seed)
+    all_metrics = {name: [] for name in VISIBILITY_CONDITIONS}
+
+    t0 = time.time()
+    for run in range(n_runs):
+        if (run + 1) % 10 == 0:
+            elapsed = time.time() - t0
+            print(f"  Run {run + 1}/{n_runs}  ({elapsed:.1f}s)")
+        bp = sample_population_blueprint(pools, rng)
+
+        for cond_name, (mechs, vis) in VISIBILITY_CONDITIONS.items():
+            agents = instantiate_population(bp)
+            cond_rng = np.random.default_rng(rng.integers(2 ** 31))
+            result = simulate_phase3(agents, pools, cond_rng, n_rounds,
+                                     mechanisms=mechs, visibility=vis)
+            metrics = compute_visibility_metrics(result, n_rounds)
+            all_metrics[cond_name].append(metrics)
+
+    elapsed = time.time() - t0
+    n_conds = len(VISIBILITY_CONDITIONS)
+    print(f"\nAll simulations complete: {elapsed:.1f}s "
+          f"({n_runs * n_conds} runs, "
+          f"~{n_runs * n_conds * n_rounds * N_AGENTS / 1e6:.0f}M agent-steps)")
+
+    aggregated = {name: aggregate_metrics(runs) for name, runs in all_metrics.items()}
+
+    print_visibility_comparison(aggregated)
+    print_dignity_analysis(aggregated)
+    print_phenotype_dignity(aggregated)
+    print_agency_analysis(aggregated)
+    print_visibility_predictions(aggregated)
+
+    return aggregated
+
+
+# ================================================================
+# VISIBILITY REPORTING
+# ================================================================
+
+def print_visibility_comparison(results):
+    """Main visibility condition comparison."""
+    print("\n" + "=" * 130)
+    print("VISIBILITY CONDITION COMPARISON")
+    print("=" * 130)
+
+    header = (f"{'Condition':<20} {'SS-Coop':>8} {'TTFR':>5} {'Rupt':>5} "
+              f"{'Gini':>6} {'DignFl':>7} {'BudFl':>6} {'SustDig':>7} "
+              f"{'Agency':>7} {'B-C r':>6} {'Navig':>6} "
+              f"{'Intrv':>5} {'Remov':>5}")
+    print(header)
+    print("-" * 130)
+
+    for name in VISIBILITY_CONDITIONS:
+        agg = results[name]
+        ss = agg.get('steady_state_coop', {}).get('median', 0)
+        ttfr = agg.get('system_ttfr', {}).get('median', 0)
+        rupt = agg.get('rupture_count', {}).get('median', 0)
+        gini = agg.get('gini', {}).get('median', 0)
+        dfloor = agg.get('dignity_floor', {}).get('median', 0)
+        bfloor = agg.get('budget_floor_p10', {}).get('median', 0)
+        sdig = agg.get('sustained_dignity', {}).get('median', 0)
+        agency = agg.get('cooperation_agency', {}).get('median', 0)
+        bcorr = agg.get('budget_coop_corr', {}).get('median', 0)
+        navig = agg.get('navigability', {}).get('median', 0)
+        interv = agg.get('intervention_count', {}).get('median', 0)
+        remov = agg.get('hybrid_removal_count', {}).get('median', 0)
+        print(f"{name:<20} {ss:>8.1f} {ttfr:>5.0f} {rupt:>5.0f} "
+              f"{gini:>6.3f} {dfloor:>7.1%} {bfloor:>6.2f} {sdig:>7.1%} "
+              f"{agency:>7.2f} {bcorr:>+6.2f} {navig:>6.3f} "
+              f"{interv:>5.0f} {remov:>5.0f}")
+
+
+def print_dignity_analysis(results):
+    """Dignity floor analysis — who maintains baseline dignity?"""
+    print("\n" + "=" * 130)
+    print("DIGNITY ANALYSIS: Which configurations maintain baseline dignity for ALL phenotypes?")
+    print("=" * 130)
+
+    b1_dfloor = results['B1_none'].get('dignity_floor', {}).get('median', 0)
+    b2_dfloor = results['B2_sustain'].get('dignity_floor', {}).get('median', 0)
+
+    print(f"  B1 baseline dignity floor:  {b1_dfloor:.1%}")
+    print(f"  B2 sustain dignity floor:   {b2_dfloor:.1%}")
+    print()
+
+    for name in VISIBILITY_CONDITIONS:
+        if name.startswith('B'):
+            continue
+        agg = results[name]
+        dfloor = agg.get('dignity_floor', {}).get('median', 0)
+        sdig = agg.get('sustained_dignity', {}).get('median', 0)
+        rupt = agg.get('rupture_count', {}).get('median', 0)
+        vs_b1 = dfloor - b1_dfloor
+        vs_b2 = dfloor - b2_dfloor
+        marker = " <<<" if dfloor > b2_dfloor else ""
+        print(f"  {name:<20} floor={dfloor:>6.1%} (vs B1: {vs_b1:>+5.1%}, "
+              f"vs B2: {vs_b2:>+5.1%})  sustained={sdig:>5.1%}  "
+              f"ruptures={rupt:>4.0f}{marker}")
+
+
+def print_phenotype_dignity(results):
+    """Per-phenotype survival under each visibility condition."""
+    print("\n" + "=" * 130)
+    print("PER-PHENOTYPE SURVIVAL (dignity by type)")
+    print("=" * 130)
+
+    header = f"{'Condition':<20}"
+    for pt in ['EC', 'CC', 'CD', 'DL']:
+        header += f" {'Surv_' + pt:>8} {'Bud_' + pt:>8}"
+    print(header)
+    print("-" * 100)
+
+    for name in VISIBILITY_CONDITIONS:
+        agg = results[name]
+        row = f"{name:<20}"
+        for pt in ['EC', 'CC', 'CD', 'DL']:
+            surv = agg.get(f'{pt}_survival', {}).get('median', 0)
+            bud = agg.get(f'{pt}_budget_T100', {}).get('median', 0)
+            row += f" {surv:>8.1%} {bud:>8.2f}"
+        print(row)
+
+
+def print_agency_analysis(results):
+    """Agency analysis — do choices matter under visibility?"""
+    print("\n" + "=" * 130)
+    print("AGENCY ANALYSIS: Does visibility enable meaningful choice?")
+    print("=" * 130)
+
+    header = (f"{'Condition':<20} {'Agency':>7} {'B-C Corr':>8} {'Gini':>6} "
+              f"{'Navig':>7} {'SS-Coop':>8}")
+    print(header)
+    print("-" * 70)
+
+    for name in VISIBILITY_CONDITIONS:
+        agg = results[name]
+        agency = agg.get('cooperation_agency', {}).get('median', 0)
+        bcorr = agg.get('budget_coop_corr', {}).get('median', 0)
+        gini = agg.get('gini', {}).get('median', 0)
+        navig = agg.get('navigability', {}).get('median', 0)
+        ss = agg.get('steady_state_coop', {}).get('median', 0)
+        print(f"{name:<20} {agency:>7.2f} {bcorr:>+8.3f} {gini:>6.3f} "
+              f"{navig:>7.3f} {ss:>8.1f}")
+
+
+def print_visibility_predictions(results):
+    """Evaluate visibility-specific predictions."""
+    print("\n" + "=" * 130)
+    print("VISIBILITY PREDICTIONS SCORECARD")
+    print("=" * 130)
+
+    scored = []
+
+    b1 = results['B1_none']
+    b2 = results['B2_sustain']
+    v4 = results['V4_full_vis']
+    v8 = results['V8_vis+graduated']
+
+    # PV1: Full visibility alone (no enforcement) improves dignity floor over baseline
+    b1_dfl = b1.get('dignity_floor', {}).get('median', 0)
+    v4_dfl = v4.get('dignity_floor', {}).get('median', 0)
+    pv1 = v4_dfl > b1_dfl
+    scored.append(('PV1', f"Full visibility improves dignity floor over baseline: "
+                          f"V4={v4_dfl:.1%} vs B1={b1_dfl:.1%}",
+                   pv1))
+
+    # PV2: Solidarity is the strongest single visibility component
+    v1_dfl = results['V1_empathy'].get('dignity_floor', {}).get('median', 0)
+    v2_dfl = results['V2_solidarity'].get('dignity_floor', {}).get('median', 0)
+    v3_dfl = results['V3_reference'].get('dignity_floor', {}).get('median', 0)
+    strongest = max([('empathy', v1_dfl), ('solidarity', v2_dfl),
+                     ('reference', v3_dfl)], key=lambda x: x[1])
+    pv2 = strongest[0] == 'solidarity'
+    scored.append(('PV2', f"Solidarity is strongest component: "
+                          f"empathy={v1_dfl:.1%}, solidarity={v2_dfl:.1%}, "
+                          f"reference={v3_dfl:.1%} → strongest={strongest[0]}",
+                   pv2))
+
+    # PV3: Visibility + graduated hybrid outperforms either alone on navigability
+    b3_nav = results['B3_rehab_grad'].get('navigability', {}).get('median', 0)
+    v4_nav = v4.get('navigability', {}).get('median', 0)
+    v8_nav = v8.get('navigability', {}).get('median', 0)
+    pv3 = v8_nav > max(b3_nav, v4_nav)
+    scored.append(('PV3', f"Vis+graduated > either alone on navigability: "
+                          f"V8={v8_nav:.3f} vs B3_grad={b3_nav:.3f}, V4_vis={v4_nav:.3f}",
+                   pv3))
+
+    # PV4: Full visibility reduces rupture count below baseline
+    b1_rupt = b1.get('rupture_count', {}).get('median', 0)
+    v4_rupt = v4.get('rupture_count', {}).get('median', 0)
+    pv4 = v4_rupt < b1_rupt
+    scored.append(('PV4', f"Full visibility reduces ruptures below baseline: "
+                          f"V4={v4_rupt:.0f} vs B1={b1_rupt:.0f}",
+                   pv4))
+
+    # PV5: Visibility + sustainability produces higher navigability than
+    #       sustainability alone (visibility enhances care-first enforcement)
+    b2_nav = b2.get('navigability', {}).get('median', 0)
+    v5_nav = results['V5_vis+sustain'].get('navigability', {}).get('median', 0)
+    pv5 = v5_nav > b2_nav
+    scored.append(('PV5', f"Vis+sustain > sustain alone on navigability: "
+                          f"V5={v5_nav:.3f} vs B2={b2_nav:.3f}",
+                   pv5))
+
+    # PV6: EC survival improves most from visibility (transparency tax inverts)
+    b1_ec_surv = b1.get('EC_survival', {}).get('median', 0)
+    v4_ec_surv = v4.get('EC_survival', {}).get('median', 0)
+    b1_cd_surv = b1.get('CD_survival', {}).get('median', 0)
+    v4_cd_surv = v4.get('CD_survival', {}).get('median', 0)
+    ec_gain = v4_ec_surv - b1_ec_surv
+    cd_gain = v4_cd_surv - b1_cd_surv
+    pv6 = ec_gain > cd_gain
+    scored.append(('PV6', f"EC gains most from visibility (transparency tax inverts): "
+                          f"EC gain={ec_gain:+.1%}, CD gain={cd_gain:+.1%}",
+                   pv6))
+
+    # PV7: There exists a configuration where navigability > B2 AND cooperation
+    #       is within 20% of B2 (the "sweet spot" — agency + dignity + performance)
+    b2_ss = b2.get('steady_state_coop', {}).get('median', 0)
+    b2_nav_val = b2.get('navigability', {}).get('median', 0)
+    sweet_spot = None
+    for name in VISIBILITY_CONDITIONS:
+        if name.startswith('B'):
+            continue
+        agg = results[name]
+        ss = agg.get('steady_state_coop', {}).get('median', 0)
+        nav = agg.get('navigability', {}).get('median', 0)
+        if nav > b2_nav_val and ss >= b2_ss * 0.80:
+            sweet_spot = name
+            break
+    pv7 = sweet_spot is not None
+    scored.append(('PV7', f"Sweet spot exists (nav > B2 AND coop within 20%): "
+                          f"{'found: ' + sweet_spot if sweet_spot else 'not found'}",
+                   pv7))
+
+    # Print scorecard
+    supported = sum(1 for _, _, s in scored if s)
+    total = len(scored)
+    print(f"\n  Score: {supported}/{total} predictions supported\n")
+    for pid, desc, result in scored:
+        status = "SUPPORTED" if result else "NOT SUPPORTED"
+        print(f"  {pid}: {status}")
+        print(f"      {desc}")
+        print()
+
+
+# ================================================================
 # ENTRY POINT
 # ================================================================
 
 if __name__ == '__main__':
-    run_phase3()
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == 'visibility':
+        run_visibility_test()
+    elif len(sys.argv) > 1 and sys.argv[1] == 'both':
+        run_phase3()
+        run_visibility_test()
+    else:
+        run_phase3()
