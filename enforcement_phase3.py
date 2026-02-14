@@ -312,13 +312,182 @@ def _apply_visibility(groups, round_contribs, dt, vis_config):
 
 
 # ================================================================
+# STRUCTURAL MECHANISMS — SYSTEM-IMPOSED, IMPERSONAL, UNIVERSAL
+# ================================================================
+
+def _apply_budget_floor(groups, floor_frac):
+    """
+    UBI: guarantee minimum budget = floor_frac * agent.params.b_initial.
+    System tops up any shortfall. No agent pays — cost is structural.
+    Returns total system cost (sum of all top-ups).
+    """
+    cost = 0.0
+    for gid, members in groups.items():
+        for ag in members:
+            floor_val = floor_frac * ag.params.b_initial
+            if ag.state.B < floor_val:
+                deficit = floor_val - ag.state.B
+                ag.state.B = floor_val
+                cost += deficit
+    return cost
+
+
+def _apply_strain_ceiling(groups, ceiling):
+    """
+    Hard cap: strain cannot exceed ceiling. System absorbs excess.
+    Prevents strain spiral (strain → low affordability → low contribution →
+    larger gap → more strain). No cost — strain is not transferable.
+    """
+    for gid, members in groups.items():
+        for ag in members:
+            if ag.state.strain > ceiling:
+                ag.state.strain = ceiling
+
+
+def _apply_contribution_matching(groups, round_contribs, match_rate):
+    """
+    System matches above-mean contributions. If agent contributed more than
+    the group mean, system adds match_rate * (excess / MAX_CONTRIB) * b_initial
+    to their budget. Makes cooperation structurally rewarded beyond natural payoff.
+    Returns total system cost (sum of all bonuses).
+    """
+    cost = 0.0
+    for gid, members in groups.items():
+        contribs = round_contribs.get(gid)
+        if contribs is None or len(contribs) == 0:
+            continue
+        mean_c = sum(contribs) / len(contribs)
+        for j, ag in enumerate(members):
+            if j < len(contribs) and contribs[j] > mean_c:
+                excess_norm = (contribs[j] - mean_c) / MAX_CONTRIB
+                bonus = match_rate * excess_norm * ag.params.b_initial
+                ag.state.B += bonus
+                cost += bonus
+    return cost
+
+
+def _apply_progressive_redistribution(groups, redist_rate):
+    """
+    Tax agents above group median budget, redistribute to agents below.
+    Unlike 3B solidarity (gated by c_base), this is structural —
+    CDs with high budget pay the same rate as CCs. Budget-neutral.
+    Returns redistribution volume (not system cost — no external source).
+    """
+    volume = 0.0
+    for gid, members in groups.items():
+        if len(members) <= 1:
+            continue
+        budgets = [ag.state.B for ag in members]
+        sorted_b = sorted(budgets)
+        median_b = sorted_b[len(members) // 2]
+
+        above = [ag for ag in members if ag.state.B > median_b]
+        below = [ag for ag in members if ag.state.B < median_b]
+
+        if above and below:
+            collected = 0.0
+            for ag in above:
+                excess = ag.state.B - median_b
+                tax = excess * redist_rate
+                ag.state.B -= tax
+                collected += tax
+            per_recipient = collected / len(below)
+            for ag in below:
+                ag.state.B += per_recipient
+            volume += collected
+    return volume
+
+
+def _apply_group_rebalancing(groups, rng):
+    """
+    Reshuffle groups to prevent defector concentration.
+    Constraint: no group has more than 1 low-c_base (< 0.4) agent.
+    Distributes low-c_base agents one per group, fills rest randomly.
+    """
+    all_members = []
+    for gid in list(groups.keys()):
+        all_members.extend(groups[gid])
+
+    if not all_members:
+        return
+
+    n = len(all_members)
+    n_groups = max(1, n // N_PER_GROUP)
+
+    low_c = [ag for ag in all_members if ag.params.c_base < 0.4]
+    high_c = [ag for ag in all_members if ag.params.c_base >= 0.4]
+
+    idx_low = list(range(len(low_c)))
+    idx_high = list(range(len(high_c)))
+    rng.shuffle(idx_low)
+    rng.shuffle(idx_high)
+    low_c = [low_c[i] for i in idx_low]
+    high_c = [high_c[i] for i in idx_high]
+
+    new_groups = {i: [] for i in range(n_groups)}
+
+    # Distribute low-c_base agents: at most 1 per group
+    for i, ag in enumerate(low_c):
+        gid = i % n_groups
+        new_groups[gid].append(ag)
+
+    # Fill remaining slots with high-c agents
+    remaining = list(high_c)
+    for gid in range(n_groups):
+        while len(new_groups[gid]) < N_PER_GROUP and remaining:
+            new_groups[gid].append(remaining.pop())
+
+    # Handle any leftover agents
+    gid_idx = 0
+    while remaining:
+        new_groups[gid_idx].append(remaining.pop())
+        gid_idx = (gid_idx + 1) % n_groups
+
+    # Update groups dict in place
+    groups.clear()
+    for gid, members in new_groups.items():
+        for ag in members:
+            ag.group_id = gid
+        groups[gid] = members
+
+
+def _apply_structural(groups, round_contribs, rnd, n_rounds, dt, structural, rng):
+    """
+    Master dispatcher for structural mechanisms.
+    Called after enforcement mechanisms, before visibility effects.
+    Returns total system cost this round.
+    """
+    cost = 0.0
+
+    if structural.get('budget_floor', 0) > 0:
+        cost += _apply_budget_floor(groups, structural['budget_floor'])
+
+    if structural.get('strain_ceiling', 0) > 0:
+        _apply_strain_ceiling(groups, structural['strain_ceiling'])
+
+    if structural.get('match_rate', 0) > 0:
+        cost += _apply_contribution_matching(
+            groups, round_contribs, structural['match_rate'])
+
+    if structural.get('redist_rate', 0) > 0:
+        _apply_progressive_redistribution(groups, structural['redist_rate'])
+
+    freq = structural.get('rebalance_freq', 0)
+    if freq > 0 and rnd > 0 and rnd % freq == 0:
+        _apply_group_rebalancing(groups, rng)
+
+    return cost
+
+
+# ================================================================
 # SIMULATE — PHASE 3 EXTENDED LOOP
 # ================================================================
 
 def simulate_phase3(agents, pools, rng, n_rounds=100, mechanisms=None,
-                     visibility=None):
+                     visibility=None, structural=None):
     """
-    Run n_rounds with pluggable mechanisms, including rehabilitation and visibility.
+    Run n_rounds with pluggable mechanisms, including rehabilitation,
+    visibility, and structural mechanisms.
 
     Extends Phase 2 simulate() with:
       - 'rehabilitation' mechanism (strain reduction, budget support, replenishment
@@ -327,11 +496,15 @@ def simulate_phase3(agents, pools, rng, n_rounds=100, mechanisms=None,
       - Intervention cost accounting
       - Hybrid escalation (rehabilitate → remove)
       - Full visibility effects (empathy, solidarity, informed reference)
+      - Structural mechanisms (budget floor, strain ceiling, contribution matching,
+        progressive redistribution, group rebalancing)
 
     mechanisms: list of (name, kwargs). Names:
       'none', 'punishment', 'threshold', 'sustainability', 'rehabilitation'
     visibility: dict with keys 'empathy', 'solidarity', 'reference' (bool each),
       or None for no visibility effects.
+    structural: dict with keys 'budget_floor', 'strain_ceiling', 'match_rate',
+      'redist_rate', 'rebalance_freq' (float/int each), or None for none.
     """
     groups = assign_groups(agents)
     dt = 1.0 / (n_rounds - 1) if n_rounds > 1 else 1.0
@@ -350,6 +523,7 @@ def simulate_phase3(agents, pools, rng, n_rounds=100, mechanisms=None,
 
     # Intervention cost tracking
     total_intervention_cost = 0.0
+    total_structural_cost = 0.0
 
     if mechanisms is None:
         mechanisms = [('none', {})]
@@ -677,6 +851,18 @@ def simulate_phase3(agents, pools, rng, n_rounds=100, mechanisms=None,
                         'post_budget': target.state.B,
                     })
 
+        # Apply structural mechanisms (after enforcement, before visibility)
+        if structural:
+            s_cost = _apply_structural(
+                groups, round_contribs, rnd, n_rounds, dt, structural, rng)
+            total_structural_cost += s_cost
+
+            # If rebalancing occurred, reset prev_contribs for new groups
+            freq = structural.get('rebalance_freq', 0)
+            if freq > 0 and rnd > 0 and rnd % freq == 0:
+                prev_c = {gid: None for gid in groups}
+                prev_p = {gid: None for gid in groups}
+
         # Apply visibility effects (end of round, after all mechanisms)
         if visibility:
             _apply_visibility(groups, round_contribs, dt, visibility)
@@ -692,6 +878,7 @@ def simulate_phase3(agents, pools, rng, n_rounds=100, mechanisms=None,
         'groups': groups,
         'events': events,
         'total_intervention_cost': total_intervention_cost,
+        'total_structural_cost': total_structural_cost,
     }
 
 
@@ -1476,6 +1663,404 @@ def print_visibility_predictions(results):
 
 
 # ================================================================
+# PHASE 3C: STRUCTURAL MECHANISMS — SYSTEM-IMPOSED, IMPERSONAL
+# ================================================================
+#
+# Shifts the burden from agents (who must process information and
+# self-regulate) to the structure (which enforces floors, caps,
+# incentives, and composition constraints universally).
+
+STRUCT_FLOOR = {
+    'budget_floor': 0.3, 'strain_ceiling': 0,
+    'match_rate': 0, 'redist_rate': 0, 'rebalance_freq': 0,
+}
+STRUCT_CEILING = {
+    'budget_floor': 0, 'strain_ceiling': 5.0,
+    'match_rate': 0, 'redist_rate': 0, 'rebalance_freq': 0,
+}
+STRUCT_MATCH = {
+    'budget_floor': 0, 'strain_ceiling': 0,
+    'match_rate': 0.2, 'redist_rate': 0, 'rebalance_freq': 0,
+}
+STRUCT_REDIST = {
+    'budget_floor': 0, 'strain_ceiling': 0,
+    'match_rate': 0, 'redist_rate': 0.1, 'rebalance_freq': 0,
+}
+STRUCT_REBALANCE = {
+    'budget_floor': 0, 'strain_ceiling': 0,
+    'match_rate': 0, 'redist_rate': 0, 'rebalance_freq': 10,
+}
+STRUCT_ALL = {
+    'budget_floor': 0.3, 'strain_ceiling': 5.0,
+    'match_rate': 0.2, 'redist_rate': 0.1, 'rebalance_freq': 0,
+}
+
+# Each condition: (mechanisms, visibility, structural)
+STRUCTURAL_CONDITIONS = {
+    # --- Controls ---
+    'B1_none':           ([('none', {})],           None,     None),
+    'B2_sustain':        ([('sustainability', {})],  None,     None),
+    'V4_full_vis':       ([('none', {})],           FULL_VIS, None),
+    # --- Structural alone (no visibility) ---
+    'S1_floor':          ([('none', {})],           None,     STRUCT_FLOOR),
+    'S2_ceiling':        ([('none', {})],           None,     STRUCT_CEILING),
+    'S3_match':          ([('none', {})],           None,     STRUCT_MATCH),
+    'S4_redist':         ([('none', {})],           None,     STRUCT_REDIST),
+    'S5_rebalance':      ([('none', {})],           None,     STRUCT_REBALANCE),
+    # --- Structural + Visibility ---
+    'SV1_floor+vis':     ([('none', {})],           FULL_VIS, STRUCT_FLOOR),
+    'SV2_ceiling+vis':   ([('none', {})],           FULL_VIS, STRUCT_CEILING),
+    'SV3_match+vis':     ([('none', {})],           FULL_VIS, STRUCT_MATCH),
+    'SV4_all_struct':    ([('none', {})],           None,     STRUCT_ALL),
+    'SV5_all+vis':       ([('none', {})],           FULL_VIS, STRUCT_ALL),
+}
+
+
+# ================================================================
+# PHASE 3C METRICS
+# ================================================================
+
+def compute_structural_metrics(result, n_rounds=100):
+    """Phase 3B visibility metrics plus structural-specific metrics."""
+    base = compute_visibility_metrics(result, n_rounds)
+    agents = result['agents']
+    active_agents = [ag for ag in agents if ag.active_to == -1]
+
+    # Structural cost
+    base['total_structural_cost'] = result.get('total_structural_cost', 0.0)
+    total_cost = base['total_structural_cost']
+
+    # Cost efficiency: SS-coop per unit structural cost
+    ss_coop = base.get('steady_state_coop', 0)
+    base['structural_cost_efficiency'] = ss_coop / max(total_cost, 0.01)
+
+    # Per-phenotype survival variance (lower = more egalitarian)
+    survivals = []
+    for ptype in ['CC', 'EC', 'CD', 'DL', 'MX']:
+        total = sum(1 for ag in agents if ag.phenotype == ptype)
+        if total == 0:
+            continue
+        survived = sum(1 for ag in active_agents if ag.phenotype == ptype
+                       and not _is_ruptured(ag))
+        survivals.append(survived / total)
+    if len(survivals) > 1:
+        mean_s = sum(survivals) / len(survivals)
+        base['survival_variance'] = sum(
+            (s - mean_s) ** 2 for s in survivals) / len(survivals)
+    else:
+        base['survival_variance'] = 0.0
+
+    # Cost-adjusted navigability: navigability / (1 + log(1 + cost))
+    nav = base.get('navigability', 0)
+    cost_penalty = 1.0 + math.log1p(total_cost)
+    base['cost_adj_navigability'] = nav / cost_penalty
+
+    return base
+
+
+# ================================================================
+# PHASE 3C RUNNER
+# ================================================================
+
+def run_structural_test(n_runs=N_RUNS, n_rounds=100, seed=46):
+    """Run all Phase 3C structural mechanism conditions."""
+    print("\n" + "=" * 130)
+    print("PHASE 3C: STRUCTURAL MECHANISMS — SHIFTING THE BURDEN FROM AGENTS TO STRUCTURE")
+    print("=" * 130)
+
+    print("\nLoading libraries and building pools...")
+    libs = load_libraries()
+    pools = build_enforcement_pools(libs)
+    for name, pool in pools.items():
+        print(f"  {name}: {len(pool)} subjects")
+
+    rng = np.random.default_rng(seed)
+    all_metrics = {name: [] for name in STRUCTURAL_CONDITIONS}
+
+    t0 = time.time()
+    for run in range(n_runs):
+        if (run + 1) % 10 == 0:
+            elapsed = time.time() - t0
+            print(f"  Run {run + 1}/{n_runs}  ({elapsed:.1f}s)")
+        bp = sample_population_blueprint(pools, rng)
+
+        for cond_name, (mechs, vis, struct) in STRUCTURAL_CONDITIONS.items():
+            agents = instantiate_population(bp)
+            cond_rng = np.random.default_rng(rng.integers(2 ** 31))
+            result = simulate_phase3(agents, pools, cond_rng, n_rounds,
+                                     mechanisms=mechs, visibility=vis,
+                                     structural=struct)
+            metrics = compute_structural_metrics(result, n_rounds)
+            all_metrics[cond_name].append(metrics)
+
+    elapsed = time.time() - t0
+    n_conds = len(STRUCTURAL_CONDITIONS)
+    print(f"\nAll simulations complete: {elapsed:.1f}s "
+          f"({n_runs * n_conds} runs, "
+          f"~{n_runs * n_conds * n_rounds * N_AGENTS / 1e6:.0f}M agent-steps)")
+
+    aggregated = {name: aggregate_metrics(runs)
+                  for name, runs in all_metrics.items()}
+
+    print_structural_comparison(aggregated)
+    print_structural_dignity(aggregated)
+    print_structural_agency(aggregated)
+    print_structural_cost_analysis(aggregated)
+    print_structural_frontier(aggregated)
+    print_structural_predictions(aggregated)
+
+    return aggregated
+
+
+# ================================================================
+# PHASE 3C REPORTING
+# ================================================================
+
+def print_structural_comparison(results):
+    """Main structural condition comparison."""
+    print("\n" + "=" * 140)
+    print("STRUCTURAL CONDITION COMPARISON")
+    print("=" * 140)
+
+    header = (f"{'Condition':<20} {'SS-Coop':>8} {'TTFR':>5} {'Rupt':>5} "
+              f"{'Gini':>6} {'DignFl':>7} {'BudFl':>6} {'SustDig':>7} "
+              f"{'Agency':>7} {'Navig':>7} {'SurvVar':>8} "
+              f"{'StrCost':>8} {'CostNav':>8}")
+    print(header)
+    print("-" * 140)
+
+    for name in STRUCTURAL_CONDITIONS:
+        agg = results[name]
+        ss = agg.get('steady_state_coop', {}).get('median', 0)
+        ttfr = agg.get('system_ttfr', {}).get('median', 0)
+        rupt = agg.get('rupture_count', {}).get('median', 0)
+        gini = agg.get('gini', {}).get('median', 0)
+        dfloor = agg.get('dignity_floor', {}).get('median', 0)
+        bfloor = agg.get('budget_floor_p10', {}).get('median', 0)
+        sdig = agg.get('sustained_dignity', {}).get('median', 0)
+        agency = agg.get('cooperation_agency', {}).get('median', 0)
+        navig = agg.get('navigability', {}).get('median', 0)
+        svar = agg.get('survival_variance', {}).get('median', 0)
+        scost = agg.get('total_structural_cost', {}).get('median', 0)
+        cnav = agg.get('cost_adj_navigability', {}).get('median', 0)
+        print(f"{name:<20} {ss:>8.1f} {ttfr:>5.0f} {rupt:>5.0f} "
+              f"{gini:>6.3f} {dfloor:>7.1%} {bfloor:>6.2f} {sdig:>7.1%} "
+              f"{agency:>7.2f} {navig:>7.3f} {svar:>8.4f} "
+              f"{scost:>8.1f} {cnav:>8.3f}")
+
+
+def print_structural_dignity(results):
+    """Dignity analysis: deltas vs B1, B2, and V4."""
+    print("\n" + "=" * 140)
+    print("DIGNITY ANALYSIS: Structural mechanisms vs baselines")
+    print("=" * 140)
+
+    b1_dfl = results['B1_none'].get('dignity_floor', {}).get('median', 0)
+    b2_dfl = results['B2_sustain'].get('dignity_floor', {}).get('median', 0)
+    v4_dfl = results['V4_full_vis'].get('dignity_floor', {}).get('median', 0)
+
+    print(f"  B1 baseline:      {b1_dfl:>6.1%}")
+    print(f"  B2 sustain:       {b2_dfl:>6.1%}")
+    print(f"  V4 full vis:      {v4_dfl:>6.1%}")
+    print()
+
+    for name in STRUCTURAL_CONDITIONS:
+        if name.startswith('B') or name == 'V4_full_vis':
+            continue
+        agg = results[name]
+        dfl = agg.get('dignity_floor', {}).get('median', 0)
+        sdig = agg.get('sustained_dignity', {}).get('median', 0)
+        rupt = agg.get('rupture_count', {}).get('median', 0)
+        vs_b1 = dfl - b1_dfl
+        vs_v4 = dfl - v4_dfl
+        marker = ""
+        if dfl > v4_dfl:
+            marker = " <<< exceeds V4"
+        elif dfl >= b1_dfl:
+            marker = " = baseline"
+        print(f"  {name:<20} floor={dfl:>6.1%} (vs B1: {vs_b1:>+5.1%}, "
+              f"vs V4: {vs_v4:>+5.1%})  sustained={sdig:>5.1%}  "
+              f"ruptures={rupt:>4.0f}{marker}")
+
+
+def print_structural_agency(results):
+    """Agency analysis with structural mechanisms."""
+    print("\n" + "=" * 140)
+    print("AGENCY ANALYSIS: Does structure enable meaningful choice?")
+    print("=" * 140)
+
+    header = (f"{'Condition':<20} {'Agency':>7} {'B-C Corr':>8} {'Gini':>6} "
+              f"{'Navig':>7} {'CostNav':>8} {'SS-Coop':>8}")
+    print(header)
+    print("-" * 75)
+
+    for name in STRUCTURAL_CONDITIONS:
+        agg = results[name]
+        agency = agg.get('cooperation_agency', {}).get('median', 0)
+        bcorr = agg.get('budget_coop_corr', {}).get('median', 0)
+        gini = agg.get('gini', {}).get('median', 0)
+        navig = agg.get('navigability', {}).get('median', 0)
+        cnav = agg.get('cost_adj_navigability', {}).get('median', 0)
+        ss = agg.get('steady_state_coop', {}).get('median', 0)
+        print(f"{name:<20} {agency:>7.2f} {bcorr:>+8.3f} {gini:>6.3f} "
+              f"{navig:>7.3f} {cnav:>8.3f} {ss:>8.1f}")
+
+
+def print_structural_cost_analysis(results):
+    """Structural cost analysis."""
+    print("\n" + "=" * 140)
+    print("STRUCTURAL COST ANALYSIS")
+    print("=" * 140)
+
+    header = (f"{'Condition':<20} {'TotalCost':>10} {'SS-Coop':>8} "
+              f"{'CostEffic':>10} {'Navig':>7} {'CostNav':>8}")
+    print(header)
+    print("-" * 75)
+
+    for name in STRUCTURAL_CONDITIONS:
+        agg = results[name]
+        scost = agg.get('total_structural_cost', {}).get('median', 0)
+        ss = agg.get('steady_state_coop', {}).get('median', 0)
+        seff = agg.get('structural_cost_efficiency', {}).get('median', 0)
+        navig = agg.get('navigability', {}).get('median', 0)
+        cnav = agg.get('cost_adj_navigability', {}).get('median', 0)
+        print(f"{name:<20} {scost:>10.2f} {ss:>8.1f} "
+              f"{seff:>10.3f} {navig:>7.3f} {cnav:>8.3f}")
+
+
+def print_structural_frontier(results):
+    """Cooperation-dignity frontier: which conditions dominate?"""
+    print("\n" + "=" * 140)
+    print("COOPERATION-DIGNITY FRONTIER")
+    print("=" * 140)
+    print("  Conditions plotted on (cooperation, dignity_floor) space.")
+    print("  A condition DOMINATES if no other condition has both higher coop AND higher dignity.")
+    print()
+
+    points = []
+    for name in STRUCTURAL_CONDITIONS:
+        agg = results[name]
+        ss = agg.get('steady_state_coop', {}).get('median', 0)
+        dfl = agg.get('dignity_floor', {}).get('median', 0)
+        navig = agg.get('navigability', {}).get('median', 0)
+        points.append((name, ss, dfl, navig))
+
+    # Find Pareto front
+    frontier = []
+    for i, (name_i, ss_i, dfl_i, nav_i) in enumerate(points):
+        dominated = False
+        for j, (name_j, ss_j, dfl_j, nav_j) in enumerate(points):
+            if i == j:
+                continue
+            if ss_j >= ss_i and dfl_j >= dfl_i and (ss_j > ss_i or dfl_j > dfl_i):
+                dominated = True
+                break
+        if not dominated:
+            frontier.append((name_i, ss_i, dfl_i, nav_i))
+
+    header = f"{'Condition':<20} {'SS-Coop':>8} {'DignFl':>7} {'Navig':>7} {'Status':>12}"
+    print(header)
+    print("-" * 60)
+
+    frontier_names = {f[0] for f in frontier}
+    for name, ss, dfl, navig in sorted(points, key=lambda p: (-p[2], -p[1])):
+        status = "FRONTIER" if name in frontier_names else ""
+        print(f"{name:<20} {ss:>8.1f} {dfl:>7.1%} {navig:>7.3f} {status:>12}")
+
+
+def print_structural_predictions(results):
+    """Evaluate Phase 3C structural predictions."""
+    print("\n" + "=" * 140)
+    print("PHASE 3C STRUCTURAL PREDICTIONS SCORECARD")
+    print("=" * 140)
+
+    scored = []
+
+    b1 = results['B1_none']
+    b2 = results['B2_sustain']
+    v4 = results['V4_full_vis']
+
+    v4_ss = v4.get('steady_state_coop', {}).get('median', 0)
+    v4_dfl = v4.get('dignity_floor', {}).get('median', 0)
+    v4_nav = v4.get('navigability', {}).get('median', 0)
+
+    # PS1: Budget floor alone exceeds visibility's cooperation
+    s1_ss = results['S1_floor'].get('steady_state_coop', {}).get('median', 0)
+    ps1 = s1_ss > v4_ss
+    scored.append(('PS1',
+        f"Budget floor exceeds visibility cooperation: "
+        f"S1={s1_ss:.1f} vs V4={v4_ss:.1f}",
+        ps1))
+
+    # PS2: Strain ceiling alone maintains dignity floor >= 75%
+    s2_dfl = results['S2_ceiling'].get('dignity_floor', {}).get('median', 0)
+    ps2 = s2_dfl >= 0.75
+    scored.append(('PS2',
+        f"Strain ceiling maintains dignity >= 75%: "
+        f"S2 dignity={s2_dfl:.1%}",
+        ps2))
+
+    # PS3: All structural (SV4) achieves cooperation >= 5.0 AND dignity >= 75%
+    sv4_ss = results['SV4_all_struct'].get('steady_state_coop', {}).get('median', 0)
+    sv4_dfl = results['SV4_all_struct'].get('dignity_floor', {}).get('median', 0)
+    ps3 = sv4_ss >= 5.0 and sv4_dfl >= 0.75
+    scored.append(('PS3',
+        f"All structural achieves coop >= 5.0 AND dignity >= 75%: "
+        f"SV4 coop={sv4_ss:.1f}, dignity={sv4_dfl:.1%}",
+        ps3))
+
+    # PS4: All structural + visibility (SV5) achieves highest navigability
+    sv5_nav = results['SV5_all+vis'].get('navigability', {}).get('median', 0)
+    all_navs = {name: results[name].get('navigability', {}).get('median', 0)
+                for name in STRUCTURAL_CONDITIONS}
+    best_nav_name = max(all_navs, key=all_navs.get)
+    ps4 = best_nav_name == 'SV5_all+vis'
+    scored.append(('PS4',
+        f"SV5 achieves highest navigability: SV5={sv5_nav:.3f}, "
+        f"best={best_nav_name}={all_navs[best_nav_name]:.3f}",
+        ps4))
+
+    # PS5: Matching > redistribution on cooperation
+    s3_ss = results['S3_match'].get('steady_state_coop', {}).get('median', 0)
+    s4_ss = results['S4_redist'].get('steady_state_coop', {}).get('median', 0)
+    ps5 = s3_ss > s4_ss
+    scored.append(('PS5',
+        f"Matching > redistribution on cooperation: "
+        f"S3_match={s3_ss:.1f} vs S4_redist={s4_ss:.1f}",
+        ps5))
+
+    # PS6: Rebalancing > budget floor on cooperation
+    s5_ss = results['S5_rebalance'].get('steady_state_coop', {}).get('median', 0)
+    ps6 = s5_ss > s1_ss
+    scored.append(('PS6',
+        f"Rebalancing > budget floor on cooperation: "
+        f"S5_rebal={s5_ss:.1f} vs S1_floor={s1_ss:.1f}",
+        ps6))
+
+    # PS7: Structural survival variance < enforcement survival variance
+    b2_svar = b2.get('survival_variance', {}).get('median', 1.0)
+    struct_svars = {}
+    for name in ['S1_floor', 'S2_ceiling', 'S3_match', 'S4_redist', 'S5_rebalance']:
+        struct_svars[name] = results[name].get('survival_variance', {}).get('median', 1.0)
+    mean_struct_svar = sum(struct_svars.values()) / max(len(struct_svars), 1)
+    ps7 = mean_struct_svar < b2_svar
+    scored.append(('PS7',
+        f"Structural survival variance < enforcement: "
+        f"mean_struct={mean_struct_svar:.4f} vs B2={b2_svar:.4f}",
+        ps7))
+
+    # Print scorecard
+    supported = sum(1 for _, _, s in scored if s)
+    total = len(scored)
+    print(f"\n  Score: {supported}/{total} predictions supported\n")
+    for pid, desc, result_val in scored:
+        status = "SUPPORTED" if result_val else "NOT SUPPORTED"
+        print(f"  {pid}: {status}")
+        print(f"      {desc}")
+        print()
+
+
+# ================================================================
 # ENTRY POINT
 # ================================================================
 
@@ -1483,6 +2068,12 @@ if __name__ == '__main__':
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == 'visibility':
         run_visibility_test()
+    elif len(sys.argv) > 1 and sys.argv[1] == 'structural':
+        run_structural_test()
+    elif len(sys.argv) > 1 and sys.argv[1] == 'all':
+        run_phase3()
+        run_visibility_test()
+        run_structural_test()
     elif len(sys.argv) > 1 and sys.argv[1] == 'both':
         run_phase3()
         run_visibility_test()
